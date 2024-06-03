@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 const db = require("./models");
 app.use(bodyParser.json());
 const userRoute = require("./routes/userRoute");
+const dotenv = require("dotenv");
+dotenv.config();
 
 // Test de la connexion à la base de données
 db.sequelize
@@ -24,6 +26,6 @@ db.sequelize.sync().then(() => {
 // Utilisez le routeur User
 app.use("/", userRoute);
 
-const PORT = 2000;
+const PORT = process.env.PORT;
 
 app.listen(PORT, () => console.log("server running on Port ", PORT));
