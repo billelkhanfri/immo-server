@@ -1,12 +1,15 @@
 const db = require("../models");
 const bcrypt = require("bcrypt");
 const { registerSchema, loginSchema } = require("../validation/userValidation");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
 
 /**
  * @desc Créé un utilisateur
  * @route POST /api/register
  * @method POST
- * @access Private
+ * @access Public
  */
 const createUser = async (req, res) => {
   // Validation du request body avec the Joi schema
@@ -37,7 +40,16 @@ const createUser = async (req, res) => {
       password: hashedPassword,
       cpi,
     });
-    res.status(201).json(user);
+
+    // Generer un token
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.SECRET_KEY,
+      { expiresIn: "4h" }
+    );
+    const { password: _, ...userWithoutPassword } = user.toJSON();
+
+    res.status(201).json({ ...userWithoutPassword, token });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -47,7 +59,7 @@ const createUser = async (req, res) => {
  * @desc Login utilisateur
  * @route POST /api/login
  * @method POST
- * @access Pblic
+ * @access Public
  */
 
 const loginUser = async (req, res) => {
@@ -80,15 +92,15 @@ const loginUser = async (req, res) => {
         .json({ error: "Email ou mot de passe invalides." });
     }
 
-    // // Générer un token JWT
-    // const token = jwt.sign(
-    //   { id: existingUser.id, email: existingUser.email },
-    //   config.jwtSecret,
-    //   { expiresIn: "1h" }
-    // );
+    // Generer un token
+    const token = jwt.sign(
+      { id: existingUser.id, email: existingUser.email },
+      process.env.SECRET_KEY,
+      { expiresIn: "4h" }
+    );
+    const { password: _, ...userWithoutPassword } = existingUser.toJSON();
 
-    // Retourner l'utilisateur et le token
-    res.status(200).json({ user: existingUser });
+    res.status(200).json({ ...userWithoutPassword, token });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
