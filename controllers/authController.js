@@ -107,7 +107,9 @@ const loginUser = async (req, res) => {
     );
     const { password: _, ...userWithoutPassword } = existingUser.toJSON();
 
-    res.status(200).json({ ...userWithoutPassword, token });
+    res
+      .status(200)
+      .json({ ...userWithoutPassword, token, message: "Connexion réussie" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

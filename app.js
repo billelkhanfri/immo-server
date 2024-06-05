@@ -7,6 +7,8 @@ app.use(bodyParser.json());
 const userRoute = require("./routes/userRoute");
 const dotenv = require("dotenv");
 dotenv.config();
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./swagger");
 
 // Test de la connexion à la base de données
 db.sequelize
@@ -26,6 +28,11 @@ db.sequelize.sync().then(() => {
 // Utilisez le routeur User
 app.use("/", userRoute);
 
+// Route pour la documentation Swagger
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 const PORT = process.env.PORT;
 
-app.listen(PORT, () => console.log("server running on Port ", PORT));
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+  console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+});

@@ -69,6 +69,12 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   const { id } = req.params;
+  // Vérification que l'utilisateur connecté est bien celui qui fait la demande
+  if (req.user.id !== parseInt(id)) {
+    return res.status(403).json({
+      error: "Vous n'êtes pas autorisé à supprimer cet utilisateur",
+    });
+  }
 
   try {
     // Rechercher l'utilisateur à supprimer dans la base de données

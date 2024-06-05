@@ -2,25 +2,25 @@ const Joi = require("joi");
 
 const registerSchema = Joi.object({
   username: Joi.string().min(3).max(25).required().messages({
-    "string.empty": "Username cannot be empty",
-    "string.min": "Username must be at least 3 characters long",
-    "string.max": "Username must be at most 25 characters long",
-    "any.required": "Username is required",
+    "string.empty": "Le nom d'utilisateur ne peut pas être vide",
+    "string.min": "Le nom d'utilisateur doit contenir au moins 3 caractères",
+    "string.max": "Le nom d'utilisateur doit contenir au maximum 25 caractères",
+    "any.required": "Le nom d'utilisateur est requis",
   }),
   email: Joi.string().email().required().messages({
-    "string.empty": "Email cannot be empty",
-    "string.email": "Must be a valid email address",
-    "any.required": "Email is required",
+    "string.empty": "L'email ne peut pas être vide",
+    "string.email": "L'email doit être une adresse valide",
+    "any.required": "L'email est requis",
   }),
   password: Joi.string().min(8).required().messages({
-    "string.empty": "Password cannot be empty",
-    "string.min": "Password must be at least 6 characters long",
-    "any.required": "Password is required",
+    "string.empty": "Le mot de passe ne peut pas être vide",
+    "string.min": "Le mot de passe doit contenir au moins 8 caractères",
+    "any.required": "Le mot de passe est requis",
   }),
   cpi: Joi.string().min(6).required().messages({
-    "string.empty": "CPI cannot be empty",
-    "any.required": "CPI is required",
-    "string.min": "CPI must be at least 6 characters long",
+    "string.empty": "Le CPI ne peut pas être vide",
+    "any.required": "Le CPI est requis",
+    "string.min": "Le CPI doit contenir au moins 6 caractères",
   }),
   termsAccepted: Joi.boolean().valid(true).required().messages({
     "any.only": "Vous devez accepter les conditions générales.",
@@ -29,22 +29,36 @@ const registerSchema = Joi.object({
 
 const loginSchema = Joi.object({
   email: Joi.string().email().required().messages({
-    "string.empty": "Email cannot be empty",
-    "string.email": "Must be a valid email address",
-    "any.required": "Email is required",
+    "string.empty": "L'email ne peut pas être vide",
+    "string.email": "L'email doit être une adresse valide",
+    "any.required": "L'email est requis",
   }),
   password: Joi.string().min(6).required().messages({
-    "string.empty": "Password cannot be empty",
-    "string.min": "Password must be at least 6 characters long",
-    "any.required": "Password is required",
+    "string.empty": "Le mot de passe ne peut pas être vide",
+    "string.min": "Le mot de passe doit contenir au moins 6 caractères",
+    "any.required": "Le mot de passe est requis",
   }),
 });
 
 const updateUserSchema = Joi.object({
-  username: Joi.string().required(),
-  email: Joi.string().email().required(),
-  password: Joi.string().min(6).required(),
-  cpi: Joi.string().required(),
+  username: Joi.string().required().messages({
+    "string.empty": "Le nom d'utilisateur ne peut pas être vide",
+    "any.required": "Le nom d'utilisateur est requis",
+  }),
+  email: Joi.string().email().required().messages({
+    "string.empty": "L'email ne peut pas être vide",
+    "string.email": "L'email doit être une adresse valide",
+    "any.required": "L'email est requis",
+  }),
+  password: Joi.string().min(6).required().messages({
+    "string.empty": "Le mot de passe ne peut pas être vide",
+    "string.min": "Le mot de passe doit contenir au moins 6 caractères",
+    "any.required": "Le mot de passe est requis",
+  }),
+  cpi: Joi.string().required().messages({
+    "string.empty": "Le CPI ne peut pas être vide",
+    "any.required": "Le CPI est requis",
+  }),
 });
 
 module.exports = {
