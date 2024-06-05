@@ -21,7 +21,7 @@ const createUser = async (req, res) => {
   }
 
   try {
-    const { username, email, password, cpi } = req.body;
+    const { username, email, password, cpi, termsAccepted } = req.body;
 
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await db.User.findOne({ where: { email } });
@@ -39,6 +39,7 @@ const createUser = async (req, res) => {
       email,
       password: hashedPassword,
       cpi,
+      termsAccepted,
     });
 
     // Generer un token
@@ -49,7 +50,13 @@ const createUser = async (req, res) => {
     );
     const { password: _, ...userWithoutPassword } = user.toJSON();
 
-    res.status(201).json({ ...userWithoutPassword, token });
+    res
+      .status(201)
+      .json({
+        ...userWithoutPassword,
+        token,
+        message: "Utilisateur créé avec succès",
+      });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

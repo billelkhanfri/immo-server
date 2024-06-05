@@ -18,6 +18,14 @@ const updateUser = async (req, res) => {
   }
 
   const { id } = req.params;
+  console.log(req.user);
+
+  // Vérification que l'utilisateur connecté est bien celui qui fait la demande
+  if (req.user.id !== parseInt(id)) {
+    return res.status(403).json({
+      error: "Vous n'êtes pas autorisé à mettre à jour cet utilisateur",
+    });
+  }
 
   try {
     // Rechercher l'utilisateur à mettre à jour dans la base de données
@@ -33,16 +41,8 @@ const updateUser = async (req, res) => {
       req.body.password = await bcrypt.hash(req.body.password, 10);
     }
 
-    // Mettre à jour les propriétés de l'utilisateur avec les nouvelles données du corps de la requête
-    const updatedData = {
-      username: req.body.username,
-      email: req.body.email,
-      password: req.body.password,
-      cpi: req.body.cpi,
-    };
-
-    // Mise à jour de l'utilisateur
-    await foundUser.update(updatedData);
+    // Mise à jour de l'utilisateur avec les nouvelles données
+    await foundUser.update(req.body);
 
     // Exclure le mot de passe des données de l'utilisateur avant de renvoyer la réponse
     const { password, ...userWithoutPassword } = foundUser.toJSON();
@@ -57,10 +57,43 @@ const updateUser = async (req, res) => {
     // Envoyer une réponse avec un message d'erreur
     res
       .status(500)
-      .json({ error: "Erreur lors de la mise à jour de l'utilisateur" }); 
+      .json({ error: "Erreur lors de la mise à jour de l'utilisateur" });
+  }
+};
+
+/**
+ * @desc Supprime un utilisateur
+ * @route DELETE /api/users/:id
+ * @access Private
+ */
+
+const deleteUser = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Rechercher l'utilisateur à supprimer dans la base de données
+    const foundUser = await db.User.findByPk(id);
+
+    // Si l'utilisateur n'existe pas, renvoyer une erreur 404
+    if (!foundUser) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+
+    // Supprimer l'utilisateur de la base de données
+    await foundUser.destroy();
+
+    // Envoyer une réponse avec un message de succès
+    res.status(200).json({ success: "Utilisateur supprimé avec succès" });
+  } catch (error) {
+    console.error("Erreur lors de la suppression de l'utilisateur:", error);
+    // Envoyer une réponse avec un message d'erreur
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la suppression de l'utilisateur" });
   }
 };
 
 module.exports = {
   updateUser,
+  deleteUser,
 };
