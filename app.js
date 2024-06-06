@@ -9,7 +9,9 @@ const dotenv = require("dotenv");
 dotenv.config();
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
+const cors = require("cors");
 
+app.use(cors());
 // Test de la connexion à la base de données
 db.sequelize
   .authenticate()

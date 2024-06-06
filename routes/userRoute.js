@@ -6,6 +6,91 @@ const { verifyToken } = require("../middlewares/verifyToken");
 
 /**
  * @swagger
+ * /api/users/:
+ *   get:
+ *     summary: Affiche tous les utilisateurs
+ *     description: Récupère une liste de tous les utilisateurs. Cette route est privée et nécessite une authentification.
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Liste des utilisateurs récupérée avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: ID de l'utilisateur
+ *                   username:
+ *                     type: string
+ *                     description: Nom d'utilisateur
+ *                   email:
+ *                     type: string
+ *                     description: Email de l'utilisateur
+ *                   cpi:
+ *                     type: string
+ *                     description: CPI de l'utilisateur
+ *       401:
+ *         description: Non autorisé
+ *       500:
+ *         description: Erreur serveur
+ */
+
+router.get("/api/users", verifyToken, userController.getAlluser);
+
+// Route pour obtenir un utilisateur par ID
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Affiche un utilisateur par ID
+ *     description: Récupère les informations d'un utilisateur spécifique par ID. Cette route est privée et nécessite une authentification.
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'utilisateur
+ *     responses:
+ *       200:
+ *         description: Informations de l'utilisateur récupérées avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: ID de l'utilisateur
+ *                 username:
+ *                   type: string
+ *                   description: Nom d'utilisateur
+ *                 email:
+ *                   type: string
+ *                   description: Email de l'utilisateur
+ *                 cpi:
+ *                   type: string
+ *                   description: CPI de l'utilisateur
+ *       401:
+ *         description: Non autorisé
+ *       404:
+ *         description: Utilisateur non trouvé
+ *       500:
+ *         description: Erreur serveur
+ */
+router.get("/api/users/:id", verifyToken, userController.getUserById);
+
+/**
+ * @swagger
  * /api/register:
  *   post:
  *     summary: Crée un nouvel utilisateur

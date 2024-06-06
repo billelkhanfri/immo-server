@@ -3,6 +3,56 @@ const bcrypt = require("bcryptjs");
 const { updateUserSchema } = require("../validation/userValidation");
 
 /**
+ * @desc Affiche tous les utilisateur
+ * @route GET /api/users
+ * @access Private
+ */
+
+const getAlluser = async (req, res) => {
+  try {
+    const users = await db.User.findAll({
+      attributes: {
+        exclude: ["password"],
+      },
+    });
+
+    const { id } = req.params;
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Erreur serveur:", error);
+    // Envoyer une réponse avec un message d'erreur
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+/**
+ * @desc Affiche utilisateur par son id
+ * @route GET /api/users:id
+ * @access Private
+ */
+
+const getUserById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await db.User.findByPk(id, {
+      attributes: {
+        exclude: ["password"],
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Erreur serveur:", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+/**
  * @desc Met à jour un utilisateur
  * @route PUT /api/users/:id
  * @access Private
@@ -18,7 +68,6 @@ const updateUser = async (req, res) => {
   }
 
   const { id } = req.params;
-  console.log(req.user);
 
   // Vérification que l'utilisateur connecté est bien celui qui fait la demande
   if (req.user.id !== parseInt(id)) {
@@ -102,4 +151,6 @@ const deleteUser = async (req, res) => {
 module.exports = {
   updateUser,
   deleteUser,
+  getAlluser,
+  getUserById,
 };
