@@ -26,7 +26,10 @@ const { verifyToken } = require("../middlewares/verifyToken");
  *                   id:
  *                     type: integer
  *                     description: ID de l'utilisateur
- *                   username:
+ *                   lastName:
+ *                     type: string
+ *                     description: Nom d'utilisateur
+ *                   firstName:
  *                     type: string
  *                     description: Nom d'utilisateur
  *                   email:
@@ -71,9 +74,12 @@ router.get("/api/users", verifyToken, userController.getAlluser);
  *                 id:
  *                   type: integer
  *                   description: ID de l'utilisateur
- *                 username:
+ *                 lastName:
  *                   type: string
  *                   description: Nom d'utilisateur
+ *                 firstName:
+ *                    type: string
+ *                    description: Prénom d'utilisateur
  *                 email:
  *                   type: string
  *                   description: Email de l'utilisateur
@@ -102,13 +108,16 @@ router.get("/api/users/:id", verifyToken, userController.getUserById);
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - lastName
+ *               - firstName
  *               - email
  *               - password
  *               - cpi
  *               - termsAccepted
  *             properties:
- *               username:
+ *               lastName:
+ *                 type: string
+ *               firstName:
  *                 type: string
  *               email:
  *                 type: string
@@ -128,8 +137,10 @@ router.get("/api/users/:id", verifyToken, userController.getUserById);
  *               properties:
  *                 id:
  *                   type: integer
- *                 username:
+ *                 lastName:
  *                   type: string
+ *                 firstName:
+ *                 type: string
  *                 email:
  *                   type: string
  *                 token:
@@ -191,7 +202,9 @@ router.post("/api/register", authController.createUser);
  *               properties:
  *                 id:
  *                   type: integer
- *                 username:
+ *                 lastName:
+ *                   type: string
+ *                 firstName:
  *                   type: string
  *                 email:
  *                   type: string
@@ -244,7 +257,9 @@ router.post("/api/login", authController.loginUser);
  *           schema:
  *             type: object
  *             properties:
- *               username:
+ *               lastName:
+ *                 type: string
+ *               firstName:
  *                 type: string
  *               email:
  *                 type: string
@@ -252,8 +267,6 @@ router.post("/api/login", authController.loginUser);
  *                 type: string
  *               cpi:
  *                 type: string
- *               termsAccepted:
- *                 type: boolean
  *     responses:
  *       200:
  *         description: Utilisateur mis à jour avec succès
@@ -269,7 +282,9 @@ router.post("/api/login", authController.loginUser);
  *                   properties:
  *                     id:
  *                       type: integer
- *                     username:
+ *                     lastName:
+ *                       type: string
+ *                     firstName:
  *                       type: string
  *                     email:
  *                       type: string

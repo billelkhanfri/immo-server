@@ -21,7 +21,7 @@ const createUser = async (req, res) => {
   }
 
   try {
-    const { username, email, password, cpi, termsAccepted } = req.body;
+    const { lastName, firstName, email, password, cpi, termsAccepted } = req.body;
 
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await db.User.findOne({ where: { email } });
@@ -35,7 +35,8 @@ const createUser = async (req, res) => {
 
     // Créer un nouvel utilisateur
     const user = await db.User.create({
-      username,
+      lastName,
+      firstName,
       email,
       password: hashedPassword,
       cpi,
