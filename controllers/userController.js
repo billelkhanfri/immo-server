@@ -11,6 +11,8 @@ const { updateUserSchema } = require("../validation/userValidation");
 const getAlluser = async (req, res) => {
   try {
     const users = await db.User.findAll({
+      include: { model: db.Profile, as: "Profile" },
+
       attributes: {
         exclude: ["password"],
       },
@@ -33,9 +35,13 @@ const getAlluser = async (req, res) => {
  */
 
 const getUserById = async (req, res) => {
-  const { id } = req.params;
   try {
-    const user = await db.User.findByPk(id, {
+    const user = await db.User.findOne({
+      where: { id: req.params.id },
+      include: {
+        model: db.Profile,
+        as: "Profile",
+      },
       attributes: {
         exclude: ["password"],
       },
@@ -47,8 +53,7 @@ const getUserById = async (req, res) => {
 
     res.status(200).json(user);
   } catch (error) {
-    console.error("Erreur serveur:", error);
-    res.status(500).json({ error: "Erreur serveur" });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -89,6 +94,9 @@ const updateUser = async (req, res) => {
     if (req.body.password) {
       req.body.password = await bcrypt.hash(req.body.password, 10);
     }
+
+    // Exclure le champ email du corps de la requête
+    delete req.body.email;
 
     // Mise à jour de l'utilisateur avec les nouvelles données
     await foundUser.update(req.body);

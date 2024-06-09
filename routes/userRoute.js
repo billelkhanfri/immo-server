@@ -6,16 +6,13 @@ const { verifyToken } = require("../middlewares/verifyToken");
 
 /**
  * @swagger
- * /api/users/:
+ * /api/users:
  *   get:
- *     summary: Affiche tous les utilisateurs
- *     description: Récupère une liste de tous les utilisateurs. Cette route est privée et nécessite une authentification.
- *     tags: [User]
- *     security:
- *       - bearerAuth: []
+ *     summary: Récupère tous les utilisateurs avec leurs profils
+ *     tags: [Users]
  *     responses:
  *       200:
- *         description: Liste des utilisateurs récupérée avec succès
+ *         description: Liste des utilisateurs avec leurs profils
  *         content:
  *           application/json:
  *             schema:
@@ -25,47 +22,64 @@ const { verifyToken } = require("../middlewares/verifyToken");
  *                 properties:
  *                   id:
  *                     type: integer
- *                     description: ID de l'utilisateur
- *                   lastName:
- *                     type: string
- *                     description: Nom d'utilisateur
  *                   firstName:
  *                     type: string
- *                     description: Nom d'utilisateur
+ *                   lastName:
+ *                     type: string
  *                   email:
  *                     type: string
- *                     description: Email de l'utilisateur
  *                   cpi:
  *                     type: string
- *                     description: CPI de l'utilisateur
- *       401:
- *         description: Non autorisé
+ *                   termsAccepted:
+ *                     type: boolean
+ *                   isEmailVerified:
+ *                     type: boolean
+ *                   profil:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       userId:
+ *                         type: integer
+ *                       organisation:
+ *                         type: string
+ *                       image:
+ *                         type: string
+ *                       competence:
+ *                         type: string
+ *                       secteur:
+ *                         type: string
  *       500:
- *         description: Erreur serveur
+ *         description: Erreur interne du serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Message d'erreur détaillé"
  */
+
 
 router.get("/api/users", verifyToken, userController.getAlluser);
 
-// Route pour obtenir un utilisateur par ID
 /**
  * @swagger
  * /api/users/{id}:
  *   get:
- *     summary: Affiche un utilisateur par ID
- *     description: Récupère les informations d'un utilisateur spécifique par ID. Cette route est privée et nécessite une authentification.
- *     tags: [User]
- *     security:
- *       - bearerAuth: []
+ *     summary: Récupère un utilisateur par ID
+ *     tags: [Users]
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: integer
+ *         required: true
  *         description: ID de l'utilisateur
  *     responses:
  *       200:
- *         description: Informations de l'utilisateur récupérées avec succès
+ *         description: Utilisateur trouvé
  *         content:
  *           application/json:
  *             schema:
@@ -73,26 +87,55 @@ router.get("/api/users", verifyToken, userController.getAlluser);
  *               properties:
  *                 id:
  *                   type: integer
- *                   description: ID de l'utilisateur
+ *                 firstName:
+ *                   type: string
  *                 lastName:
  *                   type: string
- *                   description: Nom d'utilisateur
- *                 firstName:
- *                    type: string
- *                    description: Prénom d'utilisateur
  *                 email:
  *                   type: string
- *                   description: Email de l'utilisateur
  *                 cpi:
  *                   type: string
- *                   description: CPI de l'utilisateur
- *       401:
- *         description: Non autorisé
+ *                 termsAccepted:
+ *                   type: boolean
+ *                 isEmailVerified:
+ *                   type: boolean
+ *                 profil:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     userId:
+ *                       type: integer
+ *                     organisation:
+ *                       type: string
+ *                     image:
+ *                       type: string
+ *                     competence:
+ *                       type: string
+ *                     secteur:
+ *                       type: string
  *       404:
  *         description: Utilisateur non trouvé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Utilisateur non trouvé"
  *       500:
- *         description: Erreur serveur
+ *         description: Erreur interne du serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Message d'erreur détaillé"
  */
+
 router.get("/api/users/:id", verifyToken, userController.getUserById);
 
 /**
@@ -100,7 +143,7 @@ router.get("/api/users/:id", verifyToken, userController.getUserById);
  * /api/register:
  *   post:
  *     summary: Crée un nouvel utilisateur
- *     tags: [Auth]
+ *     tags: [Authentication]
  *     requestBody:
  *       required: true
  *       content:
@@ -177,7 +220,7 @@ router.post("/api/register", authController.createUser);
  * /api/login:
  *   post:
  *     summary: Connecte un utilisateur
- *     tags: [Auth]
+ *     tags: [Authentication]
  *     requestBody:
  *       required: true
  *       content:
@@ -261,8 +304,6 @@ router.post("/api/login", authController.loginUser);
  *                 type: string
  *               firstName:
  *                 type: string
- *               email:
- *                 type: string
  *               password:
  *                 type: string
  *               cpi:
@@ -285,8 +326,6 @@ router.post("/api/login", authController.loginUser);
  *                     lastName:
  *                       type: string
  *                     firstName:
- *                       type: string
- *                     email:
  *                       type: string
  *                     cpi:
  *                       type: string
@@ -379,4 +418,32 @@ router.put("/api/users/:id", verifyToken, userController.updateUser);
  */
 router.delete("/api/users/:id", verifyToken, userController.deleteUser);
 
+// Route pour vérifier l'email
+
+/**
+ * @swagger
+ * /api/verify-email/{token}:
+ *   get:
+ *     summary: Vérifie l'email de l'utilisateur à l'aide du jeton de vérification.
+ *     description: Cette route permet de vérifier l'email de l'utilisateur en utilisant un jeton de vérification envoyé par e-mail lors de l'inscription.
+ *     tags: [Confirmation]
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Jeton de vérification envoyé par e-mail.
+ *     responses:
+ *       200:
+ *         description: Email vérifié avec succès.
+ *       400:
+ *         description: Jeton de vérification invalide ou expiré.
+ *       404:
+ *         description: Jeton de vérification introuvable.
+ *       500:
+ *         description: Erreur serveur.
+ */
+
+router.get("/api/verify-email/:token", authController.verifyEmail);
 module.exports = router;

@@ -63,11 +63,7 @@ const updateUserSchema = Joi.object({
       "Le prénom  d'utilisateur doit contenir au maximum 25 caractères",
     "any.required": "Le prénom d'utilisateur est requis",
   }),
-  email: Joi.string().email().required().messages({
-    "string.empty": "L'email ne peut pas être vide",
-    "string.email": "L'email doit être une adresse valide",
-    "any.required": "L'email est requis",
-  }),
+
   password: Joi.string().min(6).required().messages({
     "string.empty": "Le mot de passe ne peut pas être vide",
     "string.min": "Le mot de passe doit contenir au moins 6 caractères",
