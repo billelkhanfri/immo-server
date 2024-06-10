@@ -29,10 +29,17 @@ const createUser = async (req, res) => {
 
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await db.User.findOne({ where: { email } });
+    const existingUserCpi = await db.User.findOne({ where: { cpi } });
+
     if (existingUser) {
       return res
         .status(400)
-        .json({ error: "Un utilisateur avec cet email existe déjà." });
+        .json({ errorEmail: "Un utilisateur avec cet email existe déjà." });
+    }
+    if (existingUserCpi) {
+      return res
+        .status(400)
+        .json({ errorCpi: "Un utilisateur avec ce cpi existe déjà." });
     }
 
     // Hacher le mot de passe

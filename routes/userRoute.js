@@ -183,7 +183,7 @@ router.get("/api/users/:id", verifyToken, userController.getUserById);
  *                 lastName:
  *                   type: string
  *                 firstName:
- *                 type: string
+ *                   type: string
  *                 email:
  *                   type: string
  *                 token:

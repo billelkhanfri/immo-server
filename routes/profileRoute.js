@@ -22,9 +22,6 @@
  *             organisation:
  *               type: string
  *               example: "Nouvelle Organisation"
- *             image:
- *               type: string
- *               example: "nouvelle-image.jpg"
  *             competence:
  *               type: string
  *               example: "Nouvelle Compétence"
@@ -44,8 +41,6 @@
  *               type: object
  *               properties:
  *                 organisation:
- *                   type: string
- *                 image:
  *                   type: string
  *                 competence:
  *                   type: string
