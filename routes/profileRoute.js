@@ -1,91 +1,78 @@
+const express = require("express");
+const router = express.Router();
+const profileController = require("../controllers/profileController");
+const { verifyToken } = require("../middlewares/verifyToken");
 /**
  * @swagger
  * /api/profiles/{userId}:
  *   put:
- *     tags:
- *       - Profil
- *     summary: Met à jour un profil d'utilisateur
- *     description: Met à jour les informations du profil d'un utilisateur
+ *     summary: Mettre à jour le profil de l'utilisateur
+ *     tags: [Profil]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
- *       - name: userId
- *         in: path
- *         required: true
- *         type: string
- *         description: ID de l'utilisateur dont le profil doit être mis à jour
- *       - name: body
- *         in: body
- *         required: true
- *         description: Les nouvelles données du profil
+ *       - in: path
+ *         name: userId
  *         schema:
- *           type: object
- *           properties:
- *             organisation:
- *               type: string
- *               example: "Nouvelle Organisation"
- *             competence:
- *               type: string
- *               example: "Nouvelle Compétence"
- *             secteur:
- *               type: string
- *               example: "Nouveau Secteur"
+ *           type: integer
+ *         required: true
+ *         description: ID de l'utilisateur
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               organisation:
+ *                 type: string
+ *                 example: "Organisation Name"
+ *               competence:
+ *                 type: string
+ *                 example: "Competence"
+ *               secteur:
+ *                 type: string
+ *                 example: "Secteur"
  *     responses:
  *       200:
  *         description: Profil mis à jour avec succès
- *         schema:
- *           type: object
- *           properties:
- *             success:
- *               type: string
- *               example: "Profil mis à jour avec succès"
- *             profil:
+ *         content:
+ *           application/json:
+ *             schema:
  *               type: object
  *               properties:
- *                 organisation:
+ *                 success:
  *                   type: string
- *                 competence:
- *                   type: string
- *                 secteur:
- *                   type: string
+ *                   example: "Profil mis à jour avec succès"
+ *                 profile:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     organisation:
+ *                       type: string
+ *                     competence:
+ *                       type: string
+ *                     secteur:
+ *                       type: string
+ *                     userId:
+ *                       type: integer
  *       400:
- *         description: Erreur de validation ou de requête
- *         schema:
- *           type: object
- *           properties:
- *             errors:
- *               type: array
- *               items:
- *                 type: string
+ *         description: Mauvaise requête
  *       403:
- *         description: Utilisateur non autorisé
- *         schema:
- *           type: object
- *           properties:
- *             error:
- *               type: string
- *               example: "Vous n'êtes pas autorisé à mettre à jour ce profil"
+ *         description: Non autorisé
  *       404:
- *         description: Utilisateur non trouvé
- *         schema:
- *           type: object
- *           properties:
- *             error:
- *               type: string
- *               example: "Utilisateur non trouvé"
+ *         description: Profil non trouvé
  *       500:
  *         description: Erreur serveur
- *         schema:
- *           type: object
- *           properties:
- *             error:
- *               type: string
- *               example: "Erreur serveur"
  */
 
 // routes/profileRoutes.js
-const express = require("express");
-const router = express.Router();
-const profileController = require("../controllers/profileController");
 
-router.put("/api/profiles/:userId", profileController.updateProfile);
+router.put(
+  "/api/profiles/:userId",
+  verifyToken,
+  profileController.updateProfile
+);
 
 module.exports = router;

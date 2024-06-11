@@ -80,6 +80,7 @@ const updateUser = async (req, res) => {
       error: "Vous n'êtes pas autorisé à mettre à jour cet utilisateur",
     });
   }
+  console.log(req)
 
   try {
     // Rechercher l'utilisateur à mettre à jour dans la base de données
