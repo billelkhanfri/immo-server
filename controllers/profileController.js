@@ -4,6 +4,7 @@ const { updateProfileSchema } = require("../validation/profileValidation");
 /**
  * @desc Update user profile
  * @route PUT /api/profiles/:userId
+ *@method PUT 
  * @access Private
  */
 const updateProfile = async (req, res) => {
@@ -52,6 +53,23 @@ const updateProfile = async (req, res) => {
     res.status(500).json({ error: "Erreur lors de la mise à jour du profil" });
   }
 };
+
+/**
+ * @desc Profile photo update
+ * @route PUT /api/profiles/profile-photo-upload
+ * @method POST
+ * @access Private
+ */
+
+
+const uploadPhoto = async (req, res) => {
+  res.status(200).json({message : "photo avce succée"})
+  
+}
 module.exports = {
   updateProfile,
+  uploadPhoto,
+
 };
+
+

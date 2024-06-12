@@ -6,11 +6,10 @@ const createDefaultProfileImage = async (initials) => {
   const uppercaseInitials = initials.toUpperCase();
 
   // Load the Monserrat font
-//   const fontPath = path.join(__dirname, "../fonts/monserrat.fnt");
-//   const font = await Jimp.loadFont(fontPath);
+  //   const fontPath = path.join(__dirname, "../fonts/monserrat.fnt");
+  //   const font = await Jimp.loadFont(fontPath);
 
-    const font = await Jimp.loadFont(Jimp.FONT_SANS_32_WHITE);
-
+  const font = await Jimp.loadFont(Jimp.FONT_SANS_32_WHITE);
 
   // Create an image
   const image = new Jimp(100, 100, "#357edd");
@@ -29,7 +28,7 @@ const createDefaultProfileImage = async (initials) => {
     100
   );
 
-  const imagePath = `./uploads/${uppercaseInitials}.png`;
+  const imagePath = `${uppercaseInitials}.png`;
   await image.writeAsync(imagePath);
 
   return imagePath;

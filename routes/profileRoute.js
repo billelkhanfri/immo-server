@@ -73,6 +73,8 @@ router.put(
   "/api/profiles/:userId",
   verifyToken,
   profileController.updateProfile
+
 );
 
+ router.post("/api/profiles/profile-photo-upload" , profileController.uploadPhoto);
 module.exports = router;

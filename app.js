@@ -11,6 +11,10 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
 const cors = require("cors");
 const profileRoutes = require("./routes/profileRoute");
+const path = require("path")
+
+//Static Folder
+app.use(express.static(path.join(__dirname,"uploads")))
 
 app.use(cors());
 // Test de la connexion à la base de données
