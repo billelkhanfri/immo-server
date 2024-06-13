@@ -447,3 +447,4 @@ router.delete("/api/users/:id", verifyToken, userController.deleteUser);
 
 router.get("/api/verify-email/:token", authController.verifyEmail);
 module.exports = router;
+ 
