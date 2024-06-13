@@ -1,12 +1,16 @@
 const db = require("../models");
 const { updateProfileSchema } = require("../validation/profileValidation");
-const {cloudinaryRemoveImage, cloudinaryUploadImage}= require("../helpers/couldinary")
-const path =require("path")
+const {
+  cloudinaryRemoveImage,
+  cloudinaryUploadImage,
+} = require("../helpers/couldinary");
+const path = require("path");
+const fs = require("fs");
 
 /**
  * @desc Update user profile
  * @route PUT /api/profiles/:userId
- *@method PUT 
+ *@method PUT
  * @access Private
  */
 const updateProfile = async (req, res) => {
@@ -56,43 +60,51 @@ const updateProfile = async (req, res) => {
   }
 };
 
-
-
-
 /**
  * @desc Profile photo upload
- * @route PUT /api/profiles/profile-photo-upload
+ * @route POST /api/profiles/profile-photo-upload
  * @method POST
  * @access Private (only logged in user)
  */
- 
+
 const uploadPhoto = async (req, res) => {
-  // 2. get the path to the image
-  const imagePath = path.join(__dirname, `../uploads/${req.file.filename}`);
   // 1. Validation
   if (!req.file) {
     return res.status(400).json({ message: "pas de photo envoyer" });
   }
+  // 2. get the path to the image
+  const imagePath = path.join(__dirname, `../uploads/${req.file.filename}`);
 
   // 3. Upload to cloudinary
-  const result = await cloudinaryUploadImage(imagePath)
-  console.log(result)
+  const result = await cloudinaryUploadImage(imagePath);
 
   // 4 get the user from db
-
+  const profile = await db.Profile.findOne({
+    where: { userId: req.user.id },
+  });
 
   // 5. delete the old profile photo if exist
+  if (profile.image) {
+    const oldImageId = profile.image.split("/").pop().split(".")[0];
+    await cloudinaryRemoveImage(oldImageId);
+  }
+
   // 6. change the porfilePhoto filed in the db
+  profile.image = result.secure_url;
+  await profile.save();
+
+  fs.unlinkSync(imagePath);
+
   // 7 send response to client
+  res.status(200).json({
+    message: "Image téléversée avec succès",
+    imageUrl: result.secure_url,
+  });
+
   //8 remove image from the sever
-
-  res.status(200).json({ message: "image téléverser avec succée" });
-}
-
+};
 
 module.exports = {
   updateProfile,
   uploadPhoto,
-
 };
-

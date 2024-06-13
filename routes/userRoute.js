@@ -62,7 +62,7 @@ const { verifyToken } = require("../middlewares/verifyToken");
  */
 
 
-router.get("/api/users",  userController.getAlluser);
+router.get("/api/users", verifyToken, userController.getAlluser);
 
 /**
  * @swagger
@@ -136,7 +136,7 @@ router.get("/api/users",  userController.getAlluser);
  *                   example: "Message d'erreur détaillé"
  */
 
-router.get("/api/users/:id",  userController.getUserById);
+router.get("/api/users/:id", verifyToken, userController.getUserById);
 
 /**
  * @swagger

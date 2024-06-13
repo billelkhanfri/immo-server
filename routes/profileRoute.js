@@ -75,10 +75,51 @@ router.put(
   verifyToken,
   profileController.updateProfile
 );
+/**
+ * @swagger
+ * /api/profiles/profile-photo-upload:
+ *   post:
+ *     summary: Téléverser une photo de profil
+ *     tags: [Profil]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: L'image à téléverser
+ *     responses:
+ *       200:
+ *         description: Image téléversée avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Image téléversée avec succès"
+ *                 imageUrl:
+ *                   type: string
+ *                   example: "https://cloudinary.com/path/to/image.jpg"
+ *       400:
+ *         description: Pas de photo envoyée
+ *       500:
+ *         description: Erreur lors du téléversement de l'image
+ */
 
 router.post(
   "/api/profiles/profile-photo-upload",
+  verifyToken,
+
   photoUpload.single("image"),
+
   profileController.uploadPhoto
 );
 module.exports = router;
