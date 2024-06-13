@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const profileController = require("../controllers/profileController");
 const { verifyToken } = require("../middlewares/verifyToken");
+const photoUpload = require("../middlewares/multer-config");
 /**
  * @swagger
  * /api/profiles/{userId}:
@@ -73,8 +74,11 @@ router.put(
   "/api/profiles/:userId",
   verifyToken,
   profileController.updateProfile
-
 );
 
- router.post("/api/profiles/profile-photo-upload" , profileController.uploadPhoto);
+router.post(
+  "/api/profiles/profile-photo-upload",
+  photoUpload.single("image"),
+  profileController.uploadPhoto
+);
 module.exports = router;

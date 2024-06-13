@@ -1,5 +1,7 @@
 const db = require("../models");
 const { updateProfileSchema } = require("../validation/profileValidation");
+const {cloudinaryRemoveImage, cloudinaryUploadImage}= require("../helpers/couldinary")
+const path =require("path")
 
 /**
  * @desc Update user profile
@@ -54,22 +56,43 @@ const updateProfile = async (req, res) => {
   }
 };
 
+
+
+
 /**
- * @desc Profile photo update
+ * @desc Profile photo upload
  * @route PUT /api/profiles/profile-photo-upload
  * @method POST
- * @access Private
+ * @access Private (only logged in user)
  */
-
-
+ 
 const uploadPhoto = async (req, res) => {
-  res.status(200).json({message : "photo avce succée"})
-  
+  // 2. get the path to the image
+  const imagePath = path.join(__dirname, `../uploads/${req.file.filename}`);
+  // 1. Validation
+  if (!req.file) {
+    return res.status(400).json({ message: "pas de photo envoyer" });
+  }
+
+  // 3. Upload to cloudinary
+  const result = await cloudinaryUploadImage(imagePath)
+  console.log(result)
+
+  // 4 get the user from db
+
+
+  // 5. delete the old profile photo if exist
+  // 6. change the porfilePhoto filed in the db
+  // 7 send response to client
+  //8 remove image from the sever
+
+  res.status(200).json({ message: "image téléverser avec succée" });
 }
+
+
 module.exports = {
   updateProfile,
   uploadPhoto,
 
 };
-
 
