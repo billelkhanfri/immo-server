@@ -9,7 +9,6 @@ const { sendEmail } = require("../helpers/email");
 const { createDefaultProfileImage } = require("../helpers/generateImage");
 const { Op } = require("sequelize");
 
-
 /**
  * @desc Créé un utilisateur
  * @route POST /api/register
@@ -58,14 +57,15 @@ const createUser = async (req, res) => {
       termsAccepted,
       emailVerificationToken,
     });
-    const initials = `${firstName[0]}${lastName[0]}`;
-    const imagePath = await createDefaultProfileImage(initials);
+    // const initials = `${firstName[0]}${lastName[0]}`;
+    // const imagePath = await createDefaultProfileImage(initials);
 
     //Créer un profil vierge pour l'utilisateur
     await db.Profile.create({
       userId: user.id,
       organisation: "",
-      image: imagePath,
+      imageUrl: "",
+      publicId: "",
       competence: "",
       secteur: "",
     });
@@ -116,18 +116,19 @@ const loginUser = async (req, res) => {
       .json({ errors: error.details.map((detail) => detail.message) });
   }
 
-
   const { emailOrCpi, password } = req.body;
 
-    try {
+  try {
     // Vérifier si l'utilisateur existe par email ou par cpi
     const existingUser = await db.User.findOne({
       where: {
-        [Op.or]: [{ email: emailOrCpi }, { cpi: emailOrCpi }]
-      }
+        [Op.or]: [{ email: emailOrCpi }, { cpi: emailOrCpi }],
+      },
     });
-         if (!existingUser) {
-      return res.status(400).json({ error: 'Email/cpi ou mot de passe invalides.' });
+    if (!existingUser) {
+      return res
+        .status(400)
+        .json({ error: "Email/cpi ou mot de passe invalides." });
     }
 
     // Vérifier le mot de passe
@@ -138,14 +139,14 @@ const loginUser = async (req, res) => {
     if (!isPasswordMatch) {
       return res
         .status(400)
-        .json({ error: 'Email/cpi ou mot de passe invalides.'  });
+        .json({ error: "Email/cpi ou mot de passe invalides." });
     }
 
-   // Générer un token JWT
+    // Générer un token JWT
     const token = jwt.sign(
       { id: existingUser.id, email: existingUser.email },
       process.env.SECRET_KEY,
-      { expiresIn: '4h' }
+      { expiresIn: "4h" }
     );
 
     const { password: dummy, ...userWithoutPassword } = existingUser.toJSON();
@@ -153,7 +154,7 @@ const loginUser = async (req, res) => {
     res.status(200).json({
       ...userWithoutPassword,
       token,
-      message: 'Connexion réussie.',
+      message: "Connexion réussie.",
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

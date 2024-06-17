@@ -84,14 +84,18 @@ const uploadPhoto = async (req, res) => {
   });
 
   // 5. delete the old profile photo if exist
-  if (profile.image) {
-    const oldImageId = profile.image.split("/").pop().split(".")[0];
-    await cloudinaryRemoveImage(oldImageId);
+  if (profile.publicId) {
+    await cloudinaryRemoveImage(profile.publicId);
   }
 
   // 6. change the porfilePhoto filed in the db
-  profile.image = result.secure_url;
-  await profile.save();
+ 
+      await profile.update({
+        imageUrl: result.secure_url,
+        publicId: result.public_id,
+      });
+
+
 
   fs.unlinkSync(imagePath);
 

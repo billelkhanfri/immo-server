@@ -4,23 +4,23 @@ module.exports = (sequelize, DataTypes) => {
     {
       organisation: {
         type: DataTypes.STRING,
-        allownull: true,
-        validate: {},
+        allowNull: true,
       },
-      image: {
+      imageUrl: {
         type: DataTypes.STRING,
-        allownull: true,
-        validate: {},
+        allowNull: true,
+      },
+      publicId: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
       competence: {
         type: DataTypes.STRING,
         allowNull: true,
-        validate: {},
       },
       secteur: {
         type: DataTypes.STRING,
         allowNull: true,
-        validate: {},
       },
     },
     {
@@ -29,8 +29,8 @@ module.exports = (sequelize, DataTypes) => {
           if (typeof profile.organisation === "string") {
             profile.organisation = profile.organisation.trim();
           }
-          if (typeof profile.image === "string") {
-            profile.image = profile.image.trim();
+          if (typeof profile.imageUrl === "string") {
+            profile.imageUrl = profile.imageUrl.trim();
           }
           if (typeof profile.competence === "string") {
             profile.competence = profile.competence.trim();

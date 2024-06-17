@@ -1,6 +1,7 @@
 const db = require("../models");
 const bcrypt = require("bcryptjs");
 const { updateUserSchema } = require("../validation/userValidation");
+const { cloudinaryRemoveImage } = require("../helpers/couldinary");
 
 /**
  * @desc Affiche tous les utilisateur
@@ -18,8 +19,6 @@ const getAlluser = async (req, res) => {
       },
     });
 
-    const { id } = req.params;
-
     res.status(200).json(users);
   } catch (error) {
     console.error("Erreur serveur:", error);
@@ -27,7 +26,6 @@ const getAlluser = async (req, res) => {
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
-
 /**
  * @desc Affiche utilisateur par son id
  * @route GET /api/users:id
@@ -80,7 +78,7 @@ const updateUser = async (req, res) => {
       error: "Vous n'êtes pas autorisé à mettre à jour cet utilisateur",
     });
   }
-  console.log(req)
+  console.log(req);
 
   try {
     // Rechercher l'utilisateur à mettre à jour dans la base de données
@@ -132,6 +130,16 @@ const deleteUser = async (req, res) => {
     return res.status(403).json({
       error: "Vous n'êtes pas autorisé à supprimer cet utilisateur",
     });
+  }
+  // Obtenir le profil de l'utilisateur
+  const profile = await db.Profile.findOne({
+    where: { userId: id },
+  });
+
+  // supprimer la photo de profile dans cloudinary
+
+  if (profile.publicId) {
+    await cloudinaryRemoveImage(profile.publicId);
   }
 
   try {
