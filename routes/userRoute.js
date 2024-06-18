@@ -136,7 +136,7 @@ router.get("/api/users", verifyToken, userController.getAlluser);
  *                   example: "Message d'erreur détaillé"
  */
 
-router.get("/api/users/:id", verifyToken, userController.getUserById);
+router.get("/api/users/:id",  userController.getUserById);
 
 /**
  * @swagger

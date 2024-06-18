@@ -6,10 +6,17 @@ const { cloudinaryRemoveImage } = require("../helpers/couldinary");
 /**
  * @desc Affiche tous les utilisateur
  * @route GET /api/users
- * @access Private
+ * @access Private (only admin)
  */
 
 const getAlluser = async (req, res) => {
+  if (!req.user.isAdmin) {
+    return res
+      .status(403)
+      .json({
+        message: "Vous n'êtes pas autorisé",
+      });
+  }
   try {
     const users = await db.User.findAll({
       include: { model: db.Profile, as: "Profile" },
@@ -29,7 +36,7 @@ const getAlluser = async (req, res) => {
 /**
  * @desc Affiche utilisateur par son id
  * @route GET /api/users:id
- * @access Private
+ * @access public
  */
 
 const getUserById = async (req, res) => {

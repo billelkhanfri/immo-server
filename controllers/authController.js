@@ -16,12 +16,12 @@ const { Op } = require("sequelize");
  * @access Public
  */
 const createUser = async (req, res) => {
-  // Validation du request body avec le schéma Joi
+  //Validation du request body avec le schéma Joi
   const { error } = registerSchema.validate(req.body, { abortEarly: false });
   if (error) {
     return res
       .status(400)
-      .json({ errors: error.details.map((detail) => detail.message) });
+      .json({ message: error.details.map((detail) => detail.message) });
   }
 
   try {
@@ -32,15 +32,20 @@ const createUser = async (req, res) => {
     const existingUser = await db.User.findOne({ where: { email } });
     const existingUserCpi = await db.User.findOne({ where: { cpi } });
 
-    if (existingUser) {
+    // if (existingUser) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "Un utilisateur avec cet email existe déjà." });
+    // }
+    // if (existingUserCpi) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "Un utilisateur avec ce cpi existe déjà." });
+    // }
+    if (existingUser || existingUserCpi) {
       return res
         .status(400)
-        .json({ errorEmail: "Un utilisateur avec cet email existe déjà." });
-    }
-    if (existingUserCpi) {
-      return res
-        .status(400)
-        .json({ errorCpi: "Un utilisateur avec ce cpi existe déjà." });
+        .json({ message: "Les informations fournies sont déjà utilisées." });
     }
 
     // Hacher le mot de passe
@@ -91,8 +96,8 @@ const createUser = async (req, res) => {
     } = user.toJSON();
 
     res.status(201).json({
-      ...userWithoutPassword,
-      token,
+      // ...userWithoutPassword,
+      // token,
       message:
         "Utilisateur créé avec succès. Un email de vérification a été envoyé.",
     });
@@ -144,15 +149,17 @@ const loginUser = async (req, res) => {
 
     // Générer un token JWT
     const token = jwt.sign(
-      { id: existingUser.id, email: existingUser.email },
+      { id: existingUser.id, isAdmin: existingUser.isAdmin },
       process.env.SECRET_KEY,
-      { expiresIn: "4h" }
+      { expiresIn: "4h" } 
     );
 
-    const { password: dummy, ...userWithoutPassword } = existingUser.toJSON();
+    // const { password: dummy, ...userWithoutPassword } = existingUser.toJSON();
 
     res.status(200).json({
-      ...userWithoutPassword,
+      id: existingUser.id,
+      isAdmin: existingUser.isAdmin,
+      firstName: existingUser.firstName,
       token,
       message: "Connexion réussie.",
     });
