@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const db = require("./models");
 app.use(bodyParser.json());
 const userRoute = require("./routes/userRoute");
@@ -9,7 +10,6 @@ const dotenv = require("dotenv");
 dotenv.config();
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
-const cors = require("cors");
 const profileRoutes = require("./routes/profileRoute");
 const path = require("path")
 

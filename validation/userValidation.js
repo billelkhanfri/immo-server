@@ -36,7 +36,7 @@ const registerSchema = Joi.object({
 });
 
 const loginSchema = Joi.object({
-  emailorcpi: Joi.alternatives()
+  emailOrCpi: Joi.alternatives()
     .try(
       Joi.string().email().messages({
         "string.empty": "L'email ne peut pas être vide",
@@ -50,6 +50,11 @@ const loginSchema = Joi.object({
     )
     .required()
     .messages({ "any.required": "L'email ou le CPI est requis" }),
+  password: Joi.string().min(8).required().messages({
+    "string.empty": "Le mot de passe ne peut pas être vide",
+    "string.min": "Le mot de passe doit contenir au moins 8 caractères",
+    "any.required": "Le mot de passe est requis",
+  }),
 });
 
 const updateUserSchema = Joi.object({
