@@ -26,13 +26,13 @@ const updateProfile = async (req, res) => {
       .json({ errors: error.details.map((detail) => detail.message) });
   }
 
-  // // Vérification que l'utilisateur connecté est bien celui qui fait la demande
-  //  if (req.user.id !== parseInt(userId)) {
-  //   return res.status(403).json({
-  //     error: "Vous n'êtes pas autorisé à mettre à jour ce profil",
-  //   });
-  //  }
-  console.log(req);
+   // Vérification que l'utilisateur connecté est bien celui qui fait la demande
+   if (req.user.id !== userId) {
+    return res.status(403).json({
+      error: "Vous n'êtes pas autorisé à mettre à jour ce profil",
+    });
+   }
+  
 
   try {
     // Rechercher le profil à mettre à jour dans la base de données

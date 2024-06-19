@@ -2,10 +2,7 @@ module.exports = (sequelize, DataTypes) => {
   const Profile = sequelize.define(
     "Profile",
     {
-      organisation: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
+    
       imageUrl: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -15,10 +12,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       competence: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      secteur: {
         type: DataTypes.STRING,
         allowNull: true,
       },

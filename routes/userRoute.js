@@ -26,7 +26,13 @@ const { verifyToken } = require("../middlewares/verifyToken");
  *                     type: string
  *                   lastName:
  *                     type: string
+ *                   organisation:
+ *                     type: string
  *                   email:
+ *                     type: string
+ *                   telephone:
+ *                     type: string
+ *                   secteur:
  *                     type: string
  *                   cpi:
  *                     type: string
@@ -41,14 +47,11 @@ const { verifyToken } = require("../middlewares/verifyToken");
  *                         type: integer
  *                       userId:
  *                         type: integer
- *                       organisation:
- *                         type: string
  *                       image:
  *                         type: string
  *                       competence:
  *                         type: string
- *                       secteur:
- *                         type: string
+ *                    
  *       500:
  *         description: Erreur interne du serveur
  *         content:
@@ -91,7 +94,13 @@ router.get("/api/users", verifyToken, userController.getAlluser);
  *                   type: string
  *                 lastName:
  *                   type: string
+ *                 organistaion:
+ *                   type: string
  *                 email:
+ *                   type: string
+ *                 telephone:
+ *                   type: string
+ *                 secteur:
  *                   type: string
  *                 cpi:
  *                   type: string
@@ -106,14 +115,11 @@ router.get("/api/users", verifyToken, userController.getAlluser);
  *                       type: integer
  *                     userId:
  *                       type: integer
- *                     organisation:
- *                       type: string
  *                     image:
  *                       type: string
  *                     competence:
  *                       type: string
- *                     secteur:
- *                       type: string
+ *                   
  *       404:
  *         description: Utilisateur non trouvé
  *         content:
@@ -153,8 +159,10 @@ router.get("/api/users/:id",  userController.getUserById);
  *             required:
  *               - lastName
  *               - firstName
+ *               - organisation
  *               - email
  *               - password
+ *               - secteur
  *               - cpi
  *               - termsAccepted
  *             properties:
@@ -162,9 +170,15 @@ router.get("/api/users/:id",  userController.getUserById);
  *                 type: string
  *               firstName:
  *                 type: string
+ *               organisation:
+ *                 type: string
  *               email:
  *                 type: string
+ *               telephone:
+ *                 type: string
  *               password:
+ *                 type: string
+ *               secteur:
  *                 type: string
  *               cpi:
  *                 type: string
@@ -185,6 +199,8 @@ router.get("/api/users/:id",  userController.getUserById);
  *                 firstName:
  *                   type: string
  *                 email:
+ *                   type: string
+ *                 telephone:
  *                   type: string
  *                 token:
  *                   type: string
@@ -444,6 +460,53 @@ router.delete("/api/users/:id", verifyToken, userController.deleteUser);
  *       500:
  *         description: Erreur serveur.
  */
+
+
+
+/**
+ * @swagger
+ * /api/count:
+ *   get:
+ *     summary: Count the users
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: The number of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                   example: 100
+ *       403:
+ *         description: User is not authorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Vous n'êtes pas autorisé"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur serveur"
+ */
+router.get("/api/count", verifyToken, userController.countUser)
+
+
+
 
 router.get("/api/verify-email/:token", authController.verifyEmail);
 module.exports = router;

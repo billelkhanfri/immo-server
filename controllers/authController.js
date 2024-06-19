@@ -25,8 +25,17 @@ const createUser = async (req, res) => {
   }
 
   try {
-    const { firstName, lastName, email, password, cpi, termsAccepted } =
-      req.body;
+    const {
+      firstName,
+      lastName,
+      organisation,
+      telephone,
+      email,
+      password,
+      secteur,
+      cpi,
+      termsAccepted,
+    } = req.body;
 
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await db.User.findOne({ where: { email } });
@@ -56,9 +65,12 @@ const createUser = async (req, res) => {
     const user = await db.User.create({
       firstName,
       lastName,
+      organisation,
+      telephone,
       email,
       password: hashedPassword,
       cpi,
+      secteur,
       termsAccepted,
       emailVerificationToken,
     });
@@ -68,11 +80,9 @@ const createUser = async (req, res) => {
     //Créer un profil vierge pour l'utilisateur
     await db.Profile.create({
       userId: user.id,
-      organisation: "",
       imageUrl: "",
       publicId: "",
       competence: "",
-      secteur: "",
     });
 
     // Créer le lien de vérification d'email
@@ -151,7 +161,7 @@ const loginUser = async (req, res) => {
     const token = jwt.sign(
       { id: existingUser.id, isAdmin: existingUser.isAdmin },
       process.env.SECRET_KEY,
-      { expiresIn: "4h" } 
+      { expiresIn: "4h" }
     );
 
     // const { password: dummy, ...userWithoutPassword } = existingUser.toJSON();

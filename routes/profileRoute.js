@@ -25,15 +25,10 @@ const photoUpload = require("../middlewares/multer-config");
  *           schema:
  *             type: object
  *             properties:
- *               organisation:
- *                 type: string
- *                 example: "Organisation Name"
  *               competence:
  *                 type: string
  *                 example: "Competence"
- *               secteur:
- *                 type: string
- *                 example: "Secteur"
+ *              
  *     responses:
  *       200:
  *         description: Profil mis à jour avec succès
@@ -50,11 +45,7 @@ const photoUpload = require("../middlewares/multer-config");
  *                   properties:
  *                     id:
  *                       type: integer
- *                     organisation:
- *                       type: string
  *                     competence:
- *                       type: string
- *                     secteur:
  *                       type: string
  *                     userId:
  *                       type: integer

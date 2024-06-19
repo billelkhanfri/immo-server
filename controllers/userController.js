@@ -11,11 +11,9 @@ const { cloudinaryRemoveImage } = require("../helpers/couldinary");
 
 const getAlluser = async (req, res) => {
   if (!req.user.isAdmin) {
-    return res
-      .status(403)
-      .json({
-        message: "Vous n'êtes pas autorisé",
-      });
+    return res.status(403).json({
+      message: "Vous n'êtes pas autorisé",
+    });
   }
   try {
     const users = await db.User.findAll({
@@ -65,7 +63,7 @@ const getUserById = async (req, res) => {
 /**
  * @desc Met à jour un utilisateur
  * @route PUT /api/users/:id
- * @access Private
+ * @access Private(only user himself)
  */
 
 const updateUser = async (req, res) => {
@@ -80,12 +78,11 @@ const updateUser = async (req, res) => {
   const { id } = req.params;
 
   // Vérification que l'utilisateur connecté est bien celui qui fait la demande
-  if (req.user.id !== parseInt(id)) {
+  if (req.user.id !== id) {
     return res.status(403).json({
       error: "Vous n'êtes pas autorisé à mettre à jour cet utilisateur",
     });
   }
-  console.log(req);
 
   try {
     // Rechercher l'utilisateur à mettre à jour dans la base de données
@@ -133,7 +130,7 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   const { id } = req.params;
   // Vérification que l'utilisateur connecté est bien celui qui fait la demande
-  if (req.user.id !== parseInt(id)) {
+  if (req.user.id !== id) {
     return res.status(403).json({
       error: "Vous n'êtes pas autorisé à supprimer cet utilisateur",
     });
@@ -172,9 +169,36 @@ const deleteUser = async (req, res) => {
   }
 };
 
+
+
+/**
+ * @desc Affiche  le nombre des utilisateurs dans la db
+ * @route GET /api/users/count
+ * @access private(only admin)
+ */
+
+
+const countUser = async (req, res) => {
+  if (!req.user.isAdmin) {
+    return res.status(403).json({
+      message: "Vous n'êtes pas autorisé",
+    });
+  }
+  try {
+    const usersCount = await db.User.count()
+
+    res.status(200).json(usersCount);
+  } catch (error) {
+    console.error("Erreur serveur:", error);
+    // Envoyer une réponse avec un message d'erreur
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
 module.exports = {
   updateUser,
   deleteUser,
   getAlluser,
   getUserById,
+  countUser
 };
