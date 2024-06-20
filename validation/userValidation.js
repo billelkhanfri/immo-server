@@ -65,11 +65,11 @@ const loginSchema = Joi.object({
         "string.empty": "L'email ne peut pas être vide",
         "string.email": "L'email doit être une adresse valide",
       }),
-      Joi.string()
-        .pattern(/^\d{8}$/)
-        .messages({
-          "string.empty": "Le CPI ne peut pas être vide",
-        })
+      Joi.string().min(6).required().messages({
+        "string.empty": "Le CPI ne peut pas être vide",
+        "any.required": "Le CPI est requis",
+        "string.min": "Le CPI doit contenir au moins 6 caractères",
+      })
     )
     .required()
     .messages({ "any.required": "L'email ou le CPI est requis" }),

@@ -12,7 +12,7 @@ const { cloudinaryRemoveImage } = require("../helpers/couldinary");
 const getAlluser = async (req, res) => {
   if (!req.user.isAdmin) {
     return res.status(403).json({
-      message: "Vous n'êtes pas autorisé",
+      message: "Accès refusé. Vous n'êtes pas autorisé",
     });
   }
   try {

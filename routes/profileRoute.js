@@ -15,7 +15,7 @@ const photoUpload = require("../middlewares/multer-config");
  *       - in: path
  *         name: userId
  *         schema:
- *           type: integer
+ *           type: string
  *         required: true
  *         description: ID de l'utilisateur
  *     requestBody:
@@ -28,7 +28,7 @@ const photoUpload = require("../middlewares/multer-config");
  *               competence:
  *                 type: string
  *                 example: "Competence"
- *              
+ *
  *     responses:
  *       200:
  *         description: Profil mis à jour avec succès
@@ -44,11 +44,11 @@ const photoUpload = require("../middlewares/multer-config");
  *                   type: object
  *                   properties:
  *                     id:
- *                       type: integer
+ *                       type: string
  *                     competence:
  *                       type: string
  *                     userId:
- *                       type: integer
+ *                       type: string
  *       400:
  *         description: Mauvaise requête
  *       403:

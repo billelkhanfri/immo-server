@@ -46,12 +46,21 @@ const { verifyToken } = require("../middlewares/verifyToken");
  *                       id:
  *                         type: integer
  *                       userId:
- *                         type: integer
+ *                         type: string
  *                       image:
  *                         type: string
  *                       competence:
  *                         type: string
- *                    
+ *       403:
+ *         description: Accès refusé. L'utilisateur n'est pas autorisé.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Accés refusé. Vous n'êtes pas autorisé
  *       500:
  *         description: Erreur interne du serveur
  *         content:
@@ -63,7 +72,6 @@ const { verifyToken } = require("../middlewares/verifyToken");
  *                   type: string
  *                   example: "Message d'erreur détaillé"
  */
-
 
 router.get("/api/users", verifyToken, userController.getAlluser);
 
@@ -77,7 +85,7 @@ router.get("/api/users", verifyToken, userController.getAlluser);
  *       - in: path
  *         name: id
  *         schema:
- *           type: integer
+ *           type: string
  *         required: true
  *         description: ID de l'utilisateur
  *     responses:
@@ -89,7 +97,7 @@ router.get("/api/users", verifyToken, userController.getAlluser);
  *               type: object
  *               properties:
  *                 id:
- *                   type: integer
+ *                   type: string
  *                 firstName:
  *                   type: string
  *                 lastName:
@@ -114,12 +122,12 @@ router.get("/api/users", verifyToken, userController.getAlluser);
  *                     id:
  *                       type: integer
  *                     userId:
- *                       type: integer
+ *                       type: string
  *                     image:
  *                       type: string
  *                     competence:
  *                       type: string
- *                   
+ *
  *       404:
  *         description: Utilisateur non trouvé
  *         content:
@@ -142,7 +150,7 @@ router.get("/api/users", verifyToken, userController.getAlluser);
  *                   example: "Message d'erreur détaillé"
  */
 
-router.get("/api/users/:id",  userController.getUserById);
+router.get("/api/users/:id", userController.getUserById);
 
 /**
  * @swagger
@@ -244,10 +252,10 @@ router.post("/api/register", authController.createUser);
  *           schema:
  *             type: object
  *             required:
- *               - email
+ *               - emailOrCpi
  *               - password
  *             properties:
- *               email:
+ *               emailOrCpi:
  *                 type: string
  *               password:
  *                 type: string
@@ -299,16 +307,14 @@ router.post("/api/login", authController.loginUser);
  * /api/users/{id}:
  *   put:
  *     summary: Met à jour un utilisateur
- *     tags: [User]
- *     security:
- *       - bearerAuth: []
+ *     tags: [Users]
  *     parameters:
- *       - in: path
- *         name: id
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID de l'utilisateur à mettre à jour
  *         schema:
  *           type: string
- *         required: true
- *         description: ID de l'utilisateur
  *     requestBody:
  *       required: true
  *       content:
@@ -316,11 +322,18 @@ router.post("/api/login", authController.loginUser);
  *           schema:
  *             type: object
  *             properties:
- *               lastName:
- *                 type: string
  *               firstName:
  *                 type: string
+ *               lastName:
+ *                 type: string
  *               password:
+ *                 type: string
+ *                 format: password
+ *               telephone:
+ *                 type: string
+ *               organisation:
+ *                 type: string
+ *               secteur:
  *                 type: string
  *               cpi:
  *                 type: string
@@ -334,21 +347,28 @@ router.post("/api/login", authController.loginUser);
  *               properties:
  *                 success:
  *                   type: string
+ *                   example: Utilisateur mis à jour avec succès
  *                 user:
  *                   type: object
  *                   properties:
  *                     id:
  *                       type: integer
+ *                     firstName:
+ *                       type: string
  *                     lastName:
  *                       type: string
- *                     firstName:
+ *                     telephone:
+ *                       type: string
+ *                     organisation:
+ *                       type: string
+ *                     secteur:
  *                       type: string
  *                     cpi:
  *                       type: string
- *                     termsAccepted:
+ *                     isEmailVerified:
  *                       type: boolean
  *       400:
- *         description: Entrée invalide
+ *         description: Requête invalide
  *         content:
  *           application/json:
  *             schema:
@@ -359,7 +379,7 @@ router.post("/api/login", authController.loginUser);
  *                   items:
  *                     type: string
  *       403:
- *         description: Vous n'êtes pas autorisé à mettre à jour cet utilisateur
+ *         description: Accès refusé. L'utilisateur n'est pas autorisé à mettre à jour cet utilisateur.
  *         content:
  *           application/json:
  *             schema:
@@ -367,6 +387,7 @@ router.post("/api/login", authController.loginUser);
  *               properties:
  *                 error:
  *                   type: string
+ *                   example: Vous n'êtes pas autorisé à mettre à jour cet utilisateur
  *       404:
  *         description: Utilisateur non trouvé
  *         content:
@@ -376,8 +397,9 @@ router.post("/api/login", authController.loginUser);
  *               properties:
  *                 error:
  *                   type: string
+ *                   example: Utilisateur non trouvé
  *       500:
- *         description: Erreur interne du serveur
+ *         description: Erreur lors de la mise à jour de l'utilisateur
  *         content:
  *           application/json:
  *             schema:
@@ -385,7 +407,9 @@ router.post("/api/login", authController.loginUser);
  *               properties:
  *                 error:
  *                   type: string
+ *                   example: Erreur lors de la mise à jour de l'utilisateur
  */
+
 router.put("/api/users/:id", verifyToken, userController.updateUser);
 
 /**
@@ -393,7 +417,7 @@ router.put("/api/users/:id", verifyToken, userController.updateUser);
  * /api/users/{id}:
  *   delete:
  *     summary: Supprime un utilisateur
- *     tags: [User]
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -461,8 +485,6 @@ router.delete("/api/users/:id", verifyToken, userController.deleteUser);
  *         description: Erreur serveur.
  */
 
-
-
 /**
  * @swagger
  * /api/count:
@@ -503,11 +525,7 @@ router.delete("/api/users/:id", verifyToken, userController.deleteUser);
  *                   type: string
  *                   example: "Erreur serveur"
  */
-router.get("/api/count", verifyToken, userController.countUser)
-
-
-
+router.get("/api/count", verifyToken, userController.countUser);
 
 router.get("/api/verify-email/:token", authController.verifyEmail);
 module.exports = router;
- 
