@@ -83,6 +83,7 @@ const createUser = async (req, res) => {
       imageUrl: "",
       publicId: "",
       competence: "",
+      about:"",
     });
 
     // Créer le lien de vérification d'email

@@ -28,6 +28,9 @@ const photoUpload = require("../middlewares/multer-config");
  *               competence:
  *                 type: string
  *                 example: "Competence"
+ *               about:
+ *                 type: string
+ *                 example: " à propos ......."
  *
  *     responses:
  *       200:
@@ -46,6 +49,8 @@ const photoUpload = require("../middlewares/multer-config");
  *                     id:
  *                       type: string
  *                     competence:
+ *                       type: string
+ *                     about:
  *                       type: string
  *                     userId:
  *                       type: string

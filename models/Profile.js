@@ -2,7 +2,6 @@ module.exports = (sequelize, DataTypes) => {
   const Profile = sequelize.define(
     "Profile",
     {
-    
       imageUrl: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -12,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       competence: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      about: {
         type: DataTypes.STRING,
         allowNull: true,
       },

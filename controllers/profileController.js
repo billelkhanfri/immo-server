@@ -44,10 +44,10 @@ const updateProfile = async (req, res) => {
     }
 
     // Extraire les données du corps de la requête
-    const {  competence } = req.body;
+    const {  competence, about } = req.body;
 
     // Mise à jour du profil avec les nouvelles données
-    await profile.update({  competence  });
+    await profile.update({  competence , about });
 
     // Envoyer une réponse avec un message de succès et les données du profil mis à jour
     res.status(200).json({
