@@ -70,7 +70,7 @@ module.exports = (sequelize, DataTypes) => {
       hooks: {
         beforeValidate: (post, options) => {
           if (typeof post.typeDeReferral === "string") {
-            post.typeDeReferai = post.typeDeReferai.trim();
+            post.typeDeReferral = post.typeDeReferral.trim();
           }
           if (typeof post.natureDuContact === "string") {
             post.natureDuContact = post.natureDuContact.trim();
@@ -92,5 +92,3 @@ module.exports = (sequelize, DataTypes) => {
   };
   return Post;
 };
-
-

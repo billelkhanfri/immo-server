@@ -6,7 +6,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const crypto = require("crypto");
 const { sendEmail } = require("../helpers/email");
-const { createDefaultProfileImage } = require("../helpers/generateImage");
+// const { createDefaultProfileImage } = require("../helpers/generateImage");
 const { Op } = require("sequelize");
 
 /**
@@ -83,7 +83,7 @@ const createUser = async (req, res) => {
       imageUrl: "",
       publicId: "",
       competence: "",
-      about:"",
+      about: "",
     });
 
     // Créer le lien de vérification d'email
@@ -140,7 +140,12 @@ const loginUser = async (req, res) => {
       where: {
         [Op.or]: [{ email: emailOrCpi }, { cpi: emailOrCpi }],
       },
+      include: {
+        model: db.Profile,
+        as: "Profile",
+      },
     });
+
     if (!existingUser) {
       return res
         .status(400)
@@ -152,6 +157,7 @@ const loginUser = async (req, res) => {
       password,
       existingUser.password
     );
+    console.log(existingUser.Profile.imageUrl);
     if (!isPasswordMatch) {
       return res
         .status(400)
@@ -171,6 +177,8 @@ const loginUser = async (req, res) => {
       id: existingUser.id,
       isAdmin: existingUser.isAdmin,
       firstName: existingUser.firstName,
+      profilePhoto: existingUser.Profile.imageUrl,
+
       token,
       message: "Connexion réussie.",
     });

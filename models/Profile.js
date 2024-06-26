@@ -22,18 +22,14 @@ module.exports = (sequelize, DataTypes) => {
     {
       hooks: {
         beforeValidate: (profile, options) => {
-          if (typeof profile.organisation === "string") {
-            profile.organisation = profile.organisation.trim();
-          }
+        
           if (typeof profile.imageUrl === "string") {
             profile.imageUrl = profile.imageUrl.trim();
           }
           if (typeof profile.competence === "string") {
             profile.competence = profile.competence.trim();
           }
-          if (typeof profile.secteur === "string") {
-            profile.secteur = profile.secteur.trim();
-          }
+         
         },
       },
     }

@@ -140,13 +140,12 @@ module.exports = (sequelize, DataTypes) => {
       as: "Profile",
       onDelete: "CASCADE",
     });
-     User.hasMany(models.Post, {
-       foreignKey: "userId",
-       as: "Posts",
-       onDelete: "CASCADE",
-     });
+    User.hasMany(models.Post, {
+      foreignKey: "userId",
+      as: "Posts",
+      onDelete: "CASCADE",
+    });
   };
- 
 
   return User;
 };
