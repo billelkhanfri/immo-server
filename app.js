@@ -12,7 +12,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
 const profileRoutes = require("./routes/profileRoute");
 const path = require("path")
-const postRoutes = require("./routes/postRoute")
+const referralRoutes = require("./routes/referralRoute")
 
 //Static Folder
 app.use(express.static(path.join(__dirname,"uploads")))
@@ -37,7 +37,7 @@ db.sequelize.sync({ force: false }).then(() => {
 app.use("/", userRoute);
 // Utilisez le routeur User
 app.use("/", profileRoutes);
-app.use("/",postRoutes)
+app.use("/",referralRoutes)
 
 // Route pour la documentation Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

@@ -1,5 +1,5 @@
-// User.js
 const { v4: uuidv4 } = require("uuid");
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
     "User",
@@ -9,7 +9,6 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
-
       lastName: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -75,7 +74,6 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
-
       secteur: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -137,13 +135,20 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = (models) => {
     User.hasOne(models.Profile, {
       foreignKey: "userId",
-      as: "Profile",
+      as: "profile",
       onDelete: "CASCADE",
     });
-    User.hasMany(models.Post, {
-      foreignKey: "userId",
-      as: "Posts",
-      onDelete: "CASCADE",
+    User.hasMany(models.Referral, {
+      foreignKey: "senderId",
+      as: "sentReferrals",
+    });
+    User.hasMany(models.Referral, {
+      foreignKey: "receiverId",
+      as: "receivedReferrals",
+    });
+    User.hasMany(models.ReferralRequest, {
+      foreignKey: "requesterId",
+      as: "referralRequests",
     });
   };
 

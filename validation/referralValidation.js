@@ -1,7 +1,7 @@
 const Joi = require("joi");
 
 // validate create post
-const postSchema = Joi.object({
+const referralSchema = Joi.object({
   typeDeReferral: Joi.string().min(3).max(25).required().messages({
     "string.empty": "Le Type de referral  ne peut pas être vide",
     "string.min": "Le Type de referral doit contenir au moins 3 caractères",
@@ -27,7 +27,7 @@ const postSchema = Joi.object({
 });
 
 // validate update post
-const updatePostSchema = Joi.object({
+const updateReferralSchema = Joi.object({
   typeDeReferral: Joi.string().min(3).max(25).messages({
     "string.empty": "Le Type de referral  ne peut pas être vide",
     "string.min": "Le Type de referral doit contenir au moins 3 caractères",
@@ -53,6 +53,6 @@ const updatePostSchema = Joi.object({
 });
 
 module.exports = {
-  postSchema,
-  updatePostSchema,
+  referralSchema,
+  updateReferralSchema,
 };
