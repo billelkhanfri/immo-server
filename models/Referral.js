@@ -18,14 +18,14 @@ module.exports = (sequelize, DataTypes) => {
     commentaire: {
       type: DataTypes.TEXT,
     },
+    price: {
+      type: DataTypes.NUMBER,
+    },
     honnoraire: {
       type: DataTypes.DECIMAL(5, 2),
       allowNull: false,
     },
-    honnoraireConfere: {
-      type: DataTypes.DECIMAL(5, 2),
-      allowNull: false,
-    },
+
     senderId: {
       type: DataTypes.UUID,
       allowNull: false,

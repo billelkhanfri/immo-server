@@ -23,7 +23,7 @@ const createReferral = async (req, res) => {
     natureDuContact,
     commentaire,
     honnoraire,
-    honnoraireConfere,
+    price,
     receiverId,
   } = req.body;
   const senderId = req.user.id;
@@ -34,7 +34,7 @@ const createReferral = async (req, res) => {
       natureDuContact,
       commentaire,
       honnoraire,
-      honnoraireConfere,
+      price,
       senderId,
       receiverId: receiverId || null,
       status: receiverId ? "assigned" : "open", // Si receiverId est fourni, le statut est 'assigned', sinon 'open'

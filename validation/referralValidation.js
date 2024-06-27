@@ -20,9 +20,9 @@ const referralSchema = Joi.object({
     "string.empty": "Le honnoraire ne peut pas être vide",
     "any.required": "Le honnoraire est requis",
   }),
-  honnoraireConfere: Joi.number().required().messages({
-    "string.empty": "Le honnoraire confrére ne peut pas être vide",
-    "any.required": "Le honnoraire confrére est requis",
+  price: Joi.number().required().messages({
+    "string.empty": "Le prix ne peut pas être vide",
+    "any.required": "Le prix est requis",
   }),
 });
 
@@ -46,9 +46,9 @@ const updateReferralSchema = Joi.object({
     "string.empty": "Le honnoraire ne peut pas être vide",
     "any.required": "Le honnoraire est requis",
   }),
-  honnoraireConfere: Joi.number().min(6).messages({
-    "string.empty": "Le honnoraire confrére ne peut pas être vide",
-    "any.required": "Le honnoraire confrére est requis",
+  price: Joi.number().messages({
+    "string.empty": "Le prix ne peut pas être vide",
+    "any.required": "Le prix est requis",
   }),
 });
 

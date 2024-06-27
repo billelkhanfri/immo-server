@@ -135,20 +135,24 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = (models) => {
     User.hasOne(models.Profile, {
       foreignKey: "userId",
-      as: "profile",
+      as: "Profile",
       onDelete: "CASCADE",
+     
     });
     User.hasMany(models.Referral, {
       foreignKey: "senderId",
       as: "sentReferrals",
+      onDelete: "CASCADE",
     });
     User.hasMany(models.Referral, {
       foreignKey: "receiverId",
       as: "receivedReferrals",
+      onDelete: "CASCADE",
     });
     User.hasMany(models.ReferralRequest, {
       foreignKey: "requesterId",
       as: "referralRequests",
+      onDelete: "CASCADE",
     });
   };
 

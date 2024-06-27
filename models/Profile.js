@@ -17,19 +17,26 @@ module.exports = (sequelize, DataTypes) => {
       about: {
         type: DataTypes.STRING,
         allowNull: true,
+        defaultValue: "",
       },
     },
     {
       hooks: {
         beforeValidate: (profile, options) => {
-        
           if (typeof profile.imageUrl === "string") {
             profile.imageUrl = profile.imageUrl.trim();
           }
           if (typeof profile.competence === "string") {
             profile.competence = profile.competence.trim();
           }
-         
+        },
+        beforeCreate: async (profile, options) => {
+          if (!profile.about) {
+            const user = await profile.getUser();
+            if (user) {
+              profile.about = `Bonjour je suis ${user.firstName}. Agent de referral immobilier de ${user.secteur}, France. Connectez-vous avec moi pour construire un réseau de referrals partenaires et échanger des referrals.`;
+            }
+          }
         },
       },
     }
@@ -41,7 +48,6 @@ module.exports = (sequelize, DataTypes) => {
       as: "user",
       onDelete: "CASCADE",
     });
-   
   };
 
   return Profile;
