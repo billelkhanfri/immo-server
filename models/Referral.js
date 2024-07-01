@@ -36,7 +36,15 @@ module.exports = (sequelize, DataTypes) => {
     },
     status: {
       type: DataTypes.ENUM,
-      values: ["open", "assigned", "in_progress", "completed"],
+      values: [
+        "open",
+
+        "attribue",
+        "pourparlers",
+        "mondat",
+        "compromis",
+        "acte",
+      ],
       defaultValue: "open",
     },
   });

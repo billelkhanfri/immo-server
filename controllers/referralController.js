@@ -4,13 +4,102 @@ const {
   updateReferralSchema,
 } = require("../validation/referralValidation");
 
+const getAllReferrals = async (req, res) => {
+  try {
+    const referrals = await db.Referral.findAll({
+      include: {
+        model: db.User,
+        as: "sender",
+        attributes: {
+          exclude: ["password"],
+        },
+      },
+    });
+    res.status(200).json(referrals);
+  } catch (error) {
+    console.error("Erreur serveur:", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
 /**
- * @desc Créé un referral
- * @route  /api/referrals
- * @method POST
- * @access private (only logged in user)
+ * @desc Récupérer un referral par ID
+ * @route GET /api/referrals/:id
+ * @access Private (only logged in user)
+ */
+
+const getReferralById = async (req, res) => {
+  try {
+    const referral = await db.Referral.findOne({
+      where: { id: req.params.id },
+      include: {
+        model: db.User,
+        as: "sender",
+      },
+      attributes: {
+        exclude: ["password"],
+      },
+    });
+
+    if (!referral) {
+      return res.status(404).json({ error: "Referral non trouvé" });
+    }
+    res.status(200).json(referral);
+  } catch (error) {
+    res.status(500).json({ eroor: error.message });
+  }
+};
+
+/**
+ * @desc Supprime un referral
+ * @route DELETE /api/referrals/:id
+ * @access Private (only user himslef)
+ */
+
+const deleteReferral = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const referral = await db.Referral.findOne({
+      where: { id: req.params.id },
+      include: {
+        model: db.User,
+        as: "sender",
+      },
+      attributes: {
+        exclude: ["password"],
+      },
+    });
+
+    if (req.user.id !== referral.sender.id) {
+      return res.status(403).json({
+        error: "Vous n'êtes pas autorisé à supprimer le referral",
+      });
+    }
+    // Rechercher l'utilisateur à supprimer dans la base de données
+    const foundReferral = await db.Referral.findByPk(id);
+
+    // Si le referral n'existe pas, renvoyer une erreur 404
+    if (!foundReferral) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+    // Supprimer le referral de la base de données
+    await foundReferral.destroy();
+  } catch (error) {
+    console.error("Erreur lors de la suppression du referral:", error);
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la suppression du referral" });
+  }
+};
+
+/**
+ * @desc Créer un referral
+ * @route POST /api/referrals
+ * @access Private (only logged in user)
  */
 const createReferral = async (req, res) => {
+  // Validation de la requête
   const { error } = referralSchema.validate(req.body, { abortEarly: false });
   if (error) {
     return res
@@ -37,19 +126,19 @@ const createReferral = async (req, res) => {
       price,
       senderId,
       receiverId: receiverId || null,
-      status: receiverId ? "assigned" : "open", // Si receiverId est fourni, le statut est 'assigned', sinon 'open'
+      status: receiverId ? "attribue" : "open", // Si receiverId est fourni, le statut est 'attribue', sinon 'open'
     });
     res.status(201).json({ message: "Referral créé avec succès", referral });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Erreur lors de la création du referral:", error);
+    res.status(500).json({ error: "Erreur lors de la création du referral" });
   }
 };
 
 /**
  * @desc Demander un referral
- * @route  /api/referrals/:id/request
- * @method POST
- * @access private (only logged in user)
+ * @route POST /api/referrals/:id/request
+ * @access Private (only logged in user)
  */
 const requestReferral = async (req, res) => {
   const { id } = req.params; // ID du referral
@@ -59,10 +148,11 @@ const requestReferral = async (req, res) => {
     const referral = await db.Referral.findOne({
       where: { id, status: "open" },
     });
-    if (!referral)
+    if (!referral) {
       return res
         .status(404)
         .json({ message: "Referral non trouvé ou déjà attribué" });
+    }
 
     const referralRequest = await db.ReferralRequest.create({
       referralId: id,
@@ -75,15 +165,15 @@ const requestReferral = async (req, res) => {
       referralRequest,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Erreur lors de la demande de referral:", error);
+    res.status(500).json({ error: "Erreur lors de la demande de referral" });
   }
 };
 
 /**
  * @desc Mettre à jour le statut d'une demande de referral
- * @route  /api/referrals/requests/:id
- * @method PATCH
- * @access private (only logged in user)
+ * @route PATCH /api/referrals/requests/:id
+ * @access Private (only logged in user)
  */
 const updateReferralRequestStatus = async (req, res) => {
   const { id } = req.params; // ID de la demande de referral
@@ -93,10 +183,11 @@ const updateReferralRequestStatus = async (req, res) => {
     const referralRequest = await db.ReferralRequest.findOne({
       where: { id, status: "pending" },
     });
-    if (!referralRequest)
+    if (!referralRequest) {
       return res
         .status(404)
         .json({ message: "Demande de referral non trouvée ou déjà traitée" });
+    }
 
     referralRequest.status = status;
     await referralRequest.save();
@@ -106,7 +197,7 @@ const updateReferralRequestStatus = async (req, res) => {
         where: { id: referralRequest.referralId },
       });
       referral.receiverId = referralRequest.requesterId;
-      referral.status = "assigned";
+      referral.status = "attribue";
       await referral.save();
     }
 
@@ -115,20 +206,26 @@ const updateReferralRequestStatus = async (req, res) => {
       referralRequest,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(
+      "Erreur lors de la mise à jour de la demande de referral:",
+      error
+    );
+    res.status(500).json({
+      error: "Erreur lors de la mise à jour de la demande de referral",
+    });
   }
 };
 
 /**
  * @desc Mettre à jour le statut d'un referral
- * @route  /api/referrals/:id/status
- * @method PATCH
- * @access private (only logged in user)
+ * @route PATCH /api/referrals/:id/status
+ * @access Private (only logged in user)
  */
 const updateReferralStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
+  // Validation de la requête
   const { error } = updateReferralSchema.validate(
     { status },
     { abortEarly: false }
@@ -141,8 +238,9 @@ const updateReferralStatus = async (req, res) => {
 
   try {
     const referral = await db.Referral.findOne({ where: { id } });
-    if (!referral)
+    if (!referral) {
       return res.status(404).json({ message: "Referral non trouvé" });
+    }
 
     referral.status = status;
     await referral.save();
@@ -151,7 +249,13 @@ const updateReferralStatus = async (req, res) => {
       .status(200)
       .json({ message: "Statut du referral mis à jour", referral });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(
+      "Erreur lors de la mise à jour du statut du referral:",
+      error
+    );
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la mise à jour du statut du referral" });
   }
 };
 
@@ -160,4 +264,7 @@ module.exports = {
   requestReferral,
   updateReferralRequestStatus,
   updateReferralStatus,
+  getAllReferrals,
+  getReferralById,
+  deleteReferral,
 };

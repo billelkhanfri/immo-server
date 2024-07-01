@@ -32,7 +32,7 @@ const getAllUsers = async (req, res) => {
 /**
  * @desc Affiche un utilisateur par son ID
  * @route GET /api/users/:id
- * @access Public
+ * @access Private
  */
 const getUserById = async (req, res) => {
   try {

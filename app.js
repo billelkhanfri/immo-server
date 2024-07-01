@@ -34,14 +34,14 @@ db.sequelize.sync({ force: false }).then(() => {
 });
 
 // Import routes
-const userRoute = require("./routes/userRoute");
+const userRoutes = require("./routes/userRoute");
 const profileRoutes = require("./routes/profileRoute");
 const referralRoutes = require("./routes/referralRoute");
 
 // Use routes with prefixes
-app.use("/users", userRoute);
-app.use("/profiles", profileRoutes);
-app.use("/referrals", referralRoutes);
+app.use("/", userRoutes);
+app.use("/", profileRoutes);
+app.use("/", referralRoutes);
 
 // Swagger documentation route
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
