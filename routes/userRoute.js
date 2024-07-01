@@ -40,7 +40,7 @@ const { verifyToken } = require("../middlewares/verifyToken");
  *                     type: boolean
  *                   isEmailVerified:
  *                     type: boolean
- *                   profil:
+ *                   profile:
  *                     type: object
  *                     properties:
  *                       id:
@@ -60,7 +60,7 @@ const { verifyToken } = require("../middlewares/verifyToken");
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Accés refusé. Vous n'êtes pas autorisé
+ *                   example: "Accès refusé. Vous n'êtes pas autorisé"
  *       500:
  *         description: Erreur interne du serveur
  *         content:
@@ -72,8 +72,7 @@ const { verifyToken } = require("../middlewares/verifyToken");
  *                   type: string
  *                   example: "Message d'erreur détaillé"
  */
-
-router.get("/api/users", verifyToken, userController.getAlluser);
+router.get("/api/users", verifyToken, userController.getAllUsers);
 
 /**
  * @swagger
@@ -102,7 +101,7 @@ router.get("/api/users", verifyToken, userController.getAlluser);
  *                   type: string
  *                 lastName:
  *                   type: string
- *                 organistaion:
+ *                 organisation:
  *                   type: string
  *                 email:
  *                   type: string
@@ -116,7 +115,7 @@ router.get("/api/users", verifyToken, userController.getAlluser);
  *                   type: boolean
  *                 isEmailVerified:
  *                   type: boolean
- *                 profil:
+ *                 profile:
  *                   type: object
  *                   properties:
  *                     id:
@@ -127,7 +126,6 @@ router.get("/api/users", verifyToken, userController.getAlluser);
  *                       type: string
  *                     competence:
  *                       type: string
- *
  *       404:
  *         description: Utilisateur non trouvé
  *         content:
@@ -149,7 +147,6 @@ router.get("/api/users", verifyToken, userController.getAlluser);
  *                   type: string
  *                   example: "Message d'erreur détaillé"
  */
-
 router.get("/api/users/:id", userController.getUserById);
 
 /**
@@ -409,7 +406,6 @@ router.post("/api/login", authController.loginUser);
  *                   type: string
  *                   example: Erreur lors de la mise à jour de l'utilisateur
  */
-
 router.put("/api/users/:id", verifyToken, userController.updateUser);
 
 /**
@@ -445,7 +441,6 @@ router.put("/api/users/:id", verifyToken, userController.updateUser);
  *               type: object
  *               properties:
  *                 error:
- *                   type: string
  *       500:
  *         description: Erreur interne du serveur
  *         content:
@@ -454,11 +449,8 @@ router.put("/api/users/:id", verifyToken, userController.updateUser);
  *               type: object
  *               properties:
  *                 error:
- *                   type: string
  */
 router.delete("/api/users/:id", verifyToken, userController.deleteUser);
-
-// Route pour vérifier l'email
 
 /**
  * @swagger
@@ -484,18 +476,19 @@ router.delete("/api/users/:id", verifyToken, userController.deleteUser);
  *       500:
  *         description: Erreur serveur.
  */
+router.get("/api/verify-email/:token", authController.verifyEmail);
 
 /**
  * @swagger
  * /api/count:
  *   get:
- *     summary: Count the users
+ *     summary: Compte les utilisateurs
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: The number of users
+ *         description: Le nombre d'utilisateurs
  *         content:
  *           application/json:
  *             schema:
@@ -505,7 +498,7 @@ router.delete("/api/users/:id", verifyToken, userController.deleteUser);
  *                   type: integer
  *                   example: 100
  *       403:
- *         description: User is not authorized
+ *         description: Accès refusé. L'utilisateur n'est pas autorisé
  *         content:
  *           application/json:
  *             schema:
@@ -515,7 +508,7 @@ router.delete("/api/users/:id", verifyToken, userController.deleteUser);
  *                   type: string
  *                   example: "Vous n'êtes pas autorisé"
  *       500:
- *         description: Server error
+ *         description: Erreur serveur
  *         content:
  *           application/json:
  *             schema:
@@ -525,7 +518,6 @@ router.delete("/api/users/:id", verifyToken, userController.deleteUser);
  *                   type: string
  *                   example: "Erreur serveur"
  */
-router.get("/api/count", verifyToken, userController.countUser);
+router.get("/api/count", verifyToken, userController.countUsers);
 
-router.get("/api/verify-email/:token", authController.verifyEmail);
 module.exports = router;

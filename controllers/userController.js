@@ -1,24 +1,22 @@
 const db = require("../models");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const { updateUserSchema } = require("../validation/userValidation");
 const { cloudinaryRemoveImage } = require("../helpers/couldinary");
 
 /**
- * @desc Affiche tous les utilisateur
+ * @desc Affiche tous les utilisateurs
  * @route GET /api/users
- * @access Private (only admin)
+ * @access Private (seulement admin)
  */
-
-const getAlluser = async (req, res) => {
-  // if (!req.user.isAdmin) {
-  //   return res.status(403).json({
-  //     message: "Accès refusé. Vous n'êtes pas autorisé",
-  //   });
-  // }
+const getAllUsers = async (req, res) => {
+  if (!req.user.isAdmin) {
+    return res.status(403).json({
+      message: "Accès refusé. Vous n'êtes pas autorisé",
+    });
+  }
   try {
     const users = await db.User.findAll({
       include: { model: db.Profile, as: "Profile" },
-
       attributes: {
         exclude: ["password"],
       },
@@ -27,16 +25,15 @@ const getAlluser = async (req, res) => {
     res.status(200).json(users);
   } catch (error) {
     console.error("Erreur serveur:", error);
-    // Envoyer une réponse avec un message d'erreur
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
-/**
- * @desc Affiche utilisateur par son id
- * @route GET /api/users:id
- * @access public
- */
 
+/**
+ * @desc Affiche un utilisateur par son ID
+ * @route GET /api/users/:id
+ * @access Public
+ */
 const getUserById = async (req, res) => {
   try {
     const user = await db.User.findOne({
@@ -63,11 +60,10 @@ const getUserById = async (req, res) => {
 /**
  * @desc Met à jour un utilisateur
  * @route PUT /api/users/:id
- * @access Private(only user himself)
+ * @access Private (seulement l'utilisateur lui-même)
  */
-
 const updateUser = async (req, res) => {
-  // Validation du request body avec le schema Joi
+  // Validation du corps de la requête avec le schéma Joi
   const { error } = updateUserSchema.validate(req.body, { abortEarly: false });
   if (error) {
     return res
@@ -114,7 +110,6 @@ const updateUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Erreur lors de la mise à jour de l'utilisateur:", error);
-    // Envoyer une réponse avec un message d'erreur
     res
       .status(500)
       .json({ error: "Erreur lors de la mise à jour de l'utilisateur" });
@@ -126,27 +121,25 @@ const updateUser = async (req, res) => {
  * @route DELETE /api/users/:id
  * @access Private
  */
-
 const deleteUser = async (req, res) => {
   const { id } = req.params;
+
   // Vérification que l'utilisateur connecté est bien celui qui fait la demande
   if (req.user.id !== id) {
     return res.status(403).json({
       error: "Vous n'êtes pas autorisé à supprimer cet utilisateur",
     });
   }
-  // Obtenir le profil de l'utilisateur
-  const profile = await db.Profile.findOne({
-    where: { userId: id },
-  });
-
-  // supprimer la photo de profile dans cloudinary
-
-  if (profile.publicId) {
-    await cloudinaryRemoveImage(profile.publicId);
-  }
 
   try {
+    // Obtenir le profil de l'utilisateur
+    const profile = await db.Profile.findOne({ where: { userId: id } });
+
+    // Supprimer la photo de profil de Cloudinary
+    if (profile && profile.publicId) {
+      await cloudinaryRemoveImage(profile.publicId);
+    }
+
     // Rechercher l'utilisateur à supprimer dans la base de données
     const foundUser = await db.User.findByPk(id);
 
@@ -162,35 +155,29 @@ const deleteUser = async (req, res) => {
     res.status(200).json({ success: "Utilisateur supprimé avec succès" });
   } catch (error) {
     console.error("Erreur lors de la suppression de l'utilisateur:", error);
-    // Envoyer une réponse avec un message d'erreur
     res
       .status(500)
       .json({ error: "Erreur lors de la suppression de l'utilisateur" });
   }
 };
 
-
-
 /**
- * @desc Affiche  le nombre des utilisateurs dans la db
+ * @desc Affiche le nombre des utilisateurs dans la DB
  * @route GET /api/users/count
- * @access private(only admin)
+ * @access Private (seulement admin)
  */
-
-
-const countUser = async (req, res) => {
+const countUsers = async (req, res) => {
   if (!req.user.isAdmin) {
     return res.status(403).json({
       message: "Vous n'êtes pas autorisé",
     });
   }
   try {
-    const usersCount = await db.User.count()
+    const usersCount = await db.User.count();
 
     res.status(200).json(usersCount);
   } catch (error) {
     console.error("Erreur serveur:", error);
-    // Envoyer une réponse avec un message d'erreur
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
@@ -198,7 +185,7 @@ const countUser = async (req, res) => {
 module.exports = {
   updateUser,
   deleteUser,
-  getAlluser,
+  getAllUsers,
   getUserById,
-  countUser
+  countUsers,
 };

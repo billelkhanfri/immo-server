@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
     },
     price: {
-      type: DataTypes.NUMBER,
+      type: DataTypes.FLOAT,
     },
     honnoraire: {
       type: DataTypes.DECIMAL(5, 2),

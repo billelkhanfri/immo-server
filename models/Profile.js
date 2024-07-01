@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       hooks: {
         beforeValidate: (profile, options) => {
+          // Trim des champs avant validation
           if (typeof profile.imageUrl === "string") {
             profile.imageUrl = profile.imageUrl.trim();
           }
@@ -31,10 +32,11 @@ module.exports = (sequelize, DataTypes) => {
           }
         },
         beforeCreate: async (profile, options) => {
+          // Ajout d'un message par défaut pour le champ 'about' si non fourni
           if (!profile.about) {
             const user = await profile.getUser();
             if (user) {
-              profile.about = `Bonjour je suis ${user.firstName}. Agent de referral immobilier de ${user.secteur}, France. Connectez-vous avec moi pour construire un réseau de referrals partenaires et échanger des referrals.`;
+              profile.about = `Bonjour, je suis ${user.firstName}, agent de referral immobilier de ${user.secteur}, France. Connectez-vous avec moi pour construire un réseau de partenaires et échanger des referrals.`;
             }
           }
         },
@@ -42,6 +44,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
+  // Association avec le modèle 'User'
   Profile.associate = (models) => {
     Profile.belongsTo(models.User, {
       foreignKey: "userId",

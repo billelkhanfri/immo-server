@@ -69,7 +69,7 @@ module.exports = (sequelize, DataTypes) => {
             msg: "Le mot de passe ne peut pas être vide",
           },
           len: {
-            args: [8], // Minimum 8 characters
+            args: [8], // Minimum 8 caractères
             msg: "Le mot de passe doit avoir au moins 8 caractères",
           },
         },
@@ -86,7 +86,7 @@ module.exports = (sequelize, DataTypes) => {
             msg: "Le CPI ne peut pas être vide",
           },
           len: {
-            args: [6], // Minimum 6 characters
+            args: [6], // Minimum 6 caractères
             msg: "Le CPI doit avoir au moins 6 caractères",
           },
         },
@@ -112,6 +112,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       hooks: {
         beforeValidate: (user, options) => {
+          // Trim des champs avant validation
           if (typeof user.lastName === "string") {
             user.lastName = user.lastName.trim();
           }
@@ -127,17 +128,21 @@ module.exports = (sequelize, DataTypes) => {
           if (typeof user.cpi === "string") {
             user.cpi = user.cpi.trim();
           }
+          // Générer un emailVerificationToken si l'email n'est pas vérifié
+          if (!user.isEmailVerified && !user.emailVerificationToken) {
+            user.emailVerificationToken = uuidv4();
+          }
         },
       },
     }
   );
 
+  // Associations avec d'autres modèles
   User.associate = (models) => {
     User.hasOne(models.Profile, {
       foreignKey: "userId",
       as: "Profile",
       onDelete: "CASCADE",
-     
     });
     User.hasMany(models.Referral, {
       foreignKey: "senderId",

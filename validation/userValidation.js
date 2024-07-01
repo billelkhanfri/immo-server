@@ -1,19 +1,18 @@
 const Joi = require("joi");
 
+// Schéma de validation pour l'enregistrement d'un utilisateur
 const registerSchema = Joi.object({
   lastName: Joi.string().min(3).max(25).required().messages({
-    "string.empty": "Le nom d'utilisateur ne peut pas être vide",
-    "string.min": "Le nom d'utilisateur doit contenir au moins 3 caractères",
-    "string.max": "Le nom d'utilisateur doit contenir au maximum 25 caractères",
-    "any.required": "Le nom d'utilisateur est requis",
+    "string.empty": "Le nom ne peut pas être vide",
+    "string.min": "Le nom doit contenir au moins 3 caractères",
+    "string.max": "Le nom doit contenir au maximum 25 caractères",
+    "any.required": "Le nom est requis",
   }),
   firstName: Joi.string().min(3).max(25).required().messages({
-    "string.empty": "Le prénom d'utilisateur ne peut pas être vide",
-    "string.min":
-      "Le prénom  d'utilisateur doit contenir au moins 3 caractères",
-    "string.max":
-      "Le prénom  d'utilisateur doit contenir au maximum 25 caractères",
-    "any.required": "Le prénom d'utilisateur est requis",
+    "string.empty": "Le prénom ne peut pas être vide",
+    "string.min": "Le prénom doit contenir au moins 3 caractères",
+    "string.max": "Le prénom doit contenir au maximum 25 caractères",
+    "any.required": "Le prénom est requis",
   }),
   organisation: Joi.string().min(3).max(255).messages({
     "string.min":
@@ -58,6 +57,7 @@ const registerSchema = Joi.object({
   }),
 });
 
+// Schéma de validation pour la connexion d'un utilisateur
 const loginSchema = Joi.object({
   emailOrCpi: Joi.alternatives()
     .try(
@@ -80,20 +80,19 @@ const loginSchema = Joi.object({
   }),
 });
 
+// Schéma de validation pour la mise à jour d'un utilisateur
 const updateUserSchema = Joi.object({
   lastName: Joi.string().min(3).max(25).required().messages({
-    "string.empty": "Le nom d'utilisateur ne peut pas être vide",
-    "string.min": "Le nom d'utilisateur doit contenir au moins 3 caractères",
-    "string.max": "Le nom d'utilisateur doit contenir au maximum 25 caractères",
-    "any.required": "Le nom d'utilisateur est requis",
+    "string.empty": "Le nom ne peut pas être vide",
+    "string.min": "Le nom doit contenir au moins 3 caractères",
+    "string.max": "Le nom doit contenir au maximum 25 caractères",
+    "any.required": "Le nom est requis",
   }),
   firstName: Joi.string().min(3).max(25).required().messages({
-    "string.empty": "Le prénom d'utilisateur ne peut pas être vide",
-    "string.min":
-      "Le prénom  d'utilisateur doit contenir au moins 3 caractères",
-    "string.max":
-      "Le prénom  d'utilisateur doit contenir au maximum 25 caractères",
-    "any.required": "Le prénom d'utilisateur est requis",
+    "string.empty": "Le prénom ne peut pas être vide",
+    "string.min": "Le prénom doit contenir au moins 3 caractères",
+    "string.max": "Le prénom doit contenir au maximum 25 caractères",
+    "any.required": "Le prénom est requis",
   }),
   organisation: Joi.string().min(3).max(255).messages({
     "string.min":
@@ -101,7 +100,6 @@ const updateUserSchema = Joi.object({
     "string.max":
       "Le nom de l'organisation doit contenir au maximum 255 caractères",
   }),
-
   telephone: Joi.string()
     .pattern(/^\d+$/) // Vérifie que le numéro de téléphone contient uniquement des chiffres
     .min(10) // Minimum de 10 chiffres

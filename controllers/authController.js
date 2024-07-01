@@ -6,17 +6,16 @@ const dotenv = require("dotenv");
 dotenv.config();
 const crypto = require("crypto");
 const { sendEmail } = require("../helpers/email");
-// const { createDefaultProfileImage } = require("../helpers/generateImage");
 const { Op } = require("sequelize");
 
 /**
- * @desc Créé un utilisateur
+ * @desc Créer un utilisateur
  * @route POST /api/register
  * @method POST
  * @access Public
  */
 const createUser = async (req, res) => {
-  //Validation du request body avec le schéma Joi
+  // Validation du corps de la requête avec le schéma Joi
   const { error } = registerSchema.validate(req.body, { abortEarly: false });
   if (error) {
     return res
@@ -38,20 +37,11 @@ const createUser = async (req, res) => {
     } = req.body;
 
     // Vérifier si l'utilisateur existe déjà
-    const existingUser = await db.User.findOne({ where: { email } });
-    const existingUserCpi = await db.User.findOne({ where: { cpi } });
+    const existingUser = await db.User.findOne({
+      where: { [Op.or]: [{ email }, { cpi }] },
+    });
 
-    // if (existingUser) {
-    //   return res
-    //     .status(400)
-    //     .json({ message: "Un utilisateur avec cet email existe déjà." });
-    // }
-    // if (existingUserCpi) {
-    //   return res
-    //     .status(400)
-    //     .json({ message: "Un utilisateur avec ce cpi existe déjà." });
-    // }
-    if (existingUser || existingUserCpi) {
+    if (existingUser) {
       return res
         .status(400)
         .json({ message: "Les informations fournies sont déjà utilisées." });
@@ -74,10 +64,8 @@ const createUser = async (req, res) => {
       termsAccepted,
       emailVerificationToken,
     });
-    // const initials = `${firstName[0]}${lastName[0]}`;
-    // const imagePath = await createDefaultProfileImage(initials);
 
-    //Créer un profil vierge pour l'utilisateur
+    // Créer un profil vierge pour l'utilisateur
     await db.Profile.create({
       userId: user.id,
       imageUrl: "",
@@ -87,11 +75,11 @@ const createUser = async (req, res) => {
     });
 
     // Créer le lien de vérification d'email
-    const verificationUrl = `http://localhost:2000/api/verify-email/${emailVerificationToken}`;
+    const verificationUrl = `http://localhost:${process.env.PORT}/api/verify-email/${emailVerificationToken}`;
     await sendEmail(
       email,
       "Email de vérification",
-      `Nous vous adressons le lien pour vous connectez à Immo :: ${verificationUrl}`
+      `Nous vous adressons le lien pour vous connecter à Immo :: ${verificationUrl}`
     );
 
     // Générer un token JWT
@@ -100,15 +88,8 @@ const createUser = async (req, res) => {
       process.env.SECRET_KEY,
       { expiresIn: "4h" }
     );
-    const {
-      password: dummy,
-      emailVerificationToken: _,
-      ...userWithoutPassword
-    } = user.toJSON();
 
     res.status(201).json({
-      // ...userWithoutPassword,
-      // token,
       message:
         "Utilisateur créé avec succès. Un email de vérification a été envoyé.",
     });
@@ -118,13 +99,13 @@ const createUser = async (req, res) => {
 };
 
 /**
- * @desc Login utilisateur
+ * @desc Connexion utilisateur
  * @route POST /api/login
  * @method POST
  * @access Public
  */
 const loginUser = async (req, res) => {
-  // Validation du request body avec the Joi schema
+  // Validation du corps de la requête avec le schéma Joi
   const { error } = loginSchema.validate(req.body, { abortEarly: false });
   if (error) {
     return res
@@ -157,7 +138,6 @@ const loginUser = async (req, res) => {
       password,
       existingUser.password
     );
-    console.log(existingUser.Profile.imageUrl);
     if (!isPasswordMatch) {
       return res
         .status(400)
@@ -171,14 +151,11 @@ const loginUser = async (req, res) => {
       { expiresIn: "4h" }
     );
 
-    // const { password: dummy, ...userWithoutPassword } = existingUser.toJSON();
-
     res.status(200).json({
       id: existingUser.id,
       isAdmin: existingUser.isAdmin,
       firstName: existingUser.firstName,
       profilePhoto: existingUser.Profile.imageUrl,
-
       token,
       message: "Connexion réussie.",
     });
@@ -188,7 +165,7 @@ const loginUser = async (req, res) => {
 };
 
 /**
- * @desc Vérifie l'email de l'utilisateur
+ * @desc Vérification de l'email de l'utilisateur
  * @route GET /api/verify-email/:token
  * @method GET
  * @access Public

@@ -5,7 +5,12 @@ const swaggerDefinition = {
   info: {
     title: "API Documentation",
     version: "1.0.0",
-    description: "Documentation de l'API",
+    description:
+      "Documentation de l'API pour la gestion des utilisateurs et des profils.",
+    contact: {
+      name: "Support API",
+      email: "support@api.com",
+    },
   },
   servers: [
     {
@@ -27,7 +32,7 @@ const swaggerDefinition = {
 
 const options = {
   swaggerDefinition,
-  apis: ["./routes/*.js"],
+  apis: ["./routes/*.js"], // Assure-toi que le chemin vers tes fichiers de routes est correct
 };
 
 const swaggerSpec = swaggerJSDoc(options);
