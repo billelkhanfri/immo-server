@@ -10,6 +10,7 @@ const getAllReferrals = async (req, res) => {
       include: {
         model: db.User,
         as: "sender",
+
         attributes: {
           exclude: ["password"],
         },
@@ -53,7 +54,7 @@ const getReferralById = async (req, res) => {
 /**
  * @desc Supprime un referral
  * @route DELETE /api/referrals/:id
- * @access Private (only user himslef)
+ * @access Private (only user himself)
  */
 
 const deleteReferral = async (req, res) => {
@@ -61,7 +62,7 @@ const deleteReferral = async (req, res) => {
 
   try {
     const referral = await db.Referral.findOne({
-      where: { id: req.params.id },
+      where: { id },
       include: {
         model: db.User,
         as: "sender",
@@ -70,21 +71,19 @@ const deleteReferral = async (req, res) => {
         exclude: ["password"],
       },
     });
-
-    if (req.user.id !== referral.sender.id) {
+    // Si le referral n'existe pas, renvoyer une erreur 404
+    if (!referral) {
+      return res.status(404).json({ error: "Referral non trouvé" });
+    }
+    if (req.user.id !== referral.senderId) {
       return res.status(403).json({
         error: "Vous n'êtes pas autorisé à supprimer le referral",
       });
     }
-    // Rechercher l'utilisateur à supprimer dans la base de données
-    const foundReferral = await db.Referral.findByPk(id);
 
-    // Si le referral n'existe pas, renvoyer une erreur 404
-    if (!foundReferral) {
-      return res.status(404).json({ error: "Utilisateur non trouvé" });
-    }
     // Supprimer le referral de la base de données
-    await foundReferral.destroy();
+    await referral.destroy();
+    res.status(200).json({ message: "Referral supprimer aved succé" });
   } catch (error) {
     console.error("Erreur lors de la suppression du referral:", error);
     res

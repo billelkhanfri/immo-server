@@ -9,11 +9,11 @@ const { cloudinaryRemoveImage } = require("../helpers/couldinary");
  * @access Private (seulement admin)
  */
 const getAllUsers = async (req, res) => {
-  if (!req.user.isAdmin) {
-    return res.status(403).json({
-      message: "Accès refusé. Vous n'êtes pas autorisé",
-    });
-  }
+  // if (!req.user.isAdmin) {
+  //   return res.status(403).json({
+  //     message: "Accès refusé. Vous n'êtes pas autorisé",
+  //   });
+  // }
   try {
     const users = await db.User.findAll({
       include: { model: db.Profile, as: "Profile" },
