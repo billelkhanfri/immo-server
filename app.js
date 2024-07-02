@@ -14,7 +14,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware setup
-app.use(cors());
+app.use(cors()); // Enable CORS for all origins
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "uploads")));
 
@@ -55,5 +55,9 @@ app.use((err, req, res, next) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+  console.log(
+    `Swagger docs available at http://${
+      process.env.HOST || "localhost"
+    }:${PORT}/api-docs`
+  );
 });
