@@ -144,6 +144,14 @@ const requestReferral = async (req, res) => {
   const requesterId = req.user.id;
 
   try {
+    // const isExsistingRequest = await db.ReferralRequest.findOne({
+    //   where: { requesterId },
+    // });
+    // if (isExsistingRequest) {
+    //   return res
+    //     .status(401)
+    //     .json({ message: "vous avez déja envoyer une demande a ce referral" });
+    // }
     const referral = await db.Referral.findOne({
       where: { id, status: "open" },
     });
@@ -198,6 +206,11 @@ const updateReferralRequestStatus = async (req, res) => {
       referral.receiverId = referralRequest.requesterId;
       referral.status = "attribue";
       await referral.save();
+      // Rejeter toutes les autres demandes pour ce referral
+      await db.ReferralRequest.update(
+        { status: "rejected" },
+        { where: { referralId: referral.id, status: "pending" } }
+      );
     }
 
     res.status(200).json({

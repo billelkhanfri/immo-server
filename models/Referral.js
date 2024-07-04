@@ -38,7 +38,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM,
       values: [
         "open",
-
         "attribue",
         "pourparlers",
         "mondat",
@@ -50,14 +49,20 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Referral.associate = (models) => {
-    Referral.belongsTo(models.User, { foreignKey: "senderId", as: "sender" });
+    Referral.belongsTo(models.User, {
+      foreignKey: "senderId",
+      as: "sender",
+      onDelete: "CASCADE",
+    });
     Referral.belongsTo(models.User, {
       foreignKey: "receiverId",
       as: "receiver",
+      onDelete: "CASCADE",
     });
     Referral.hasMany(models.ReferralRequest, {
       foreignKey: "referralId",
       as: "referralRequests",
+      onDelete: "CASCADE",
     });
   };
 
