@@ -20,16 +20,28 @@ const { verifyToken } = require("../middlewares/verifyToken");
  *             properties:
  *               typeDeReferral:
  *                 type: string
+ *                 description: Type de referral
+ *                 example: "type1"
  *               natureDuContact:
  *                 type: string
+ *                 description: Nature du contact
+ *                 example: "contact direct"
  *               commentaire:
  *                 type: string
+ *                 description: Commentaire sur le referral
+ *                 example: "Ceci est un commentaire"
  *               honnoraire:
  *                 type: number
+ *                 description: Honnoraire du referral
+ *                 example: 100
  *               price:
  *                 type: number
+ *                 description: Prix du referral
+ *                 example: 200
  *               receiverId:
  *                 type: string
+ *                 description: ID du receiver, peut être null
+ *                 example: "123e4567-e89b-12d3-a456-426614174000"
  *     responses:
  *       201:
  *         description: Referral créé avec succès
@@ -166,7 +178,7 @@ router.delete(
 
 /**
  * @swagger
- * /api/referrals/:id/request:
+ * /api/referrals/{id}/request:
  *   post:
  *     summary: Demander un referral
  *     tags: [Referrals]
@@ -195,7 +207,7 @@ router.post(
 
 /**
  * @swagger
- * /api/referrals/requests/:id:
+ * /api/referrals/requests/{id}:
  *   patch:
  *     summary: Mettre à jour le statut d'une demande de referral
  *     tags: [Referrals]

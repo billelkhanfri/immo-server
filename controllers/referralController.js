@@ -99,12 +99,12 @@ const deleteReferral = async (req, res) => {
  */
 const createReferral = async (req, res) => {
   // Validation de la requête
-  const { error } = referralSchema.validate(req.body, { abortEarly: false });
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: error.details.map((detail) => detail.message) });
-  }
+  // const { error } = referralSchema.validate(req.body, { abortEarly: false });
+  // if (error) {
+  //   return res
+  //     .status(400)
+  //     .json({ message: error.details.map((detail) => detail.message) });
+  // }
 
   const {
     typeDeReferral,
@@ -142,6 +142,8 @@ const createReferral = async (req, res) => {
 const requestReferral = async (req, res) => {
   const { id } = req.params; // ID du referral
   const requesterId = req.user.id;
+  console.log("Referral ID:", id); // Ajoutez cette ligne pour vérifier l'ID
+  console.log("Requester ID:", requesterId); // Vérifiez également l'ID du demandeur
 
   try {
     // const isExsistingRequest = await db.ReferralRequest.findOne({
@@ -186,11 +188,19 @@ const updateReferralRequestStatus = async (req, res) => {
   const { id } = req.params; // ID de la demande de referral
   const { status } = req.body; // 'accepted' ou 'rejected'
 
+  if (!["accepted", "rejected"].includes(status)) {
+    return res.status(400).json({ message: "Statut invalide" });
+  }
+
   try {
+    console.log(
+      `Recherche de la demande de referral avec id: ${id} et status: pending`
+    );
     const referralRequest = await db.ReferralRequest.findOne({
       where: { id, status: "pending" },
     });
     if (!referralRequest) {
+      console.log("Demande de referral non trouvée ou déjà traitée");
       return res
         .status(404)
         .json({ message: "Demande de referral non trouvée ou déjà traitée" });
@@ -198,15 +208,29 @@ const updateReferralRequestStatus = async (req, res) => {
 
     referralRequest.status = status;
     await referralRequest.save();
+    console.log(`Statut de la demande de referral mis à jour en: ${status}`);
 
     if (status === "accepted") {
+      console.log(
+        `Recherche du referral avec id: ${referralRequest.referralId}`
+      );
       const referral = await db.Referral.findOne({
         where: { id: referralRequest.referralId },
       });
+      if (!referral) {
+        console.log("Referral non trouvé");
+        return res.status(404).json({ message: "Referral non trouvé" });
+      }
+
       referral.receiverId = referralRequest.requesterId;
-      referral.status = "attribue";
+      referral.status = "attribue"; // Assurez-vous que cette valeur est correcte
       await referral.save();
+      console.log(`Referral attribué à: ${referral.receiverId}`);
+
       // Rejeter toutes les autres demandes pour ce referral
+      console.log(
+        `Rejet de toutes les autres demandes pour le referral id: ${referral.id}`
+      );
       await db.ReferralRequest.update(
         { status: "rejected" },
         { where: { referralId: referral.id, status: "pending" } }
@@ -238,15 +262,15 @@ const updateReferralStatus = async (req, res) => {
   const { status } = req.body;
 
   // Validation de la requête
-  const { error } = updateReferralSchema.validate(
-    { status },
-    { abortEarly: false }
-  );
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: error.details.map((detail) => detail.message) });
-  }
+  // const { error } = updateReferralSchema.validate(
+  //   { status },
+  //   { abortEarly: false }
+  // );
+  // if (error) {
+  //   return res
+  //     .status(400)
+  //     .json({ message: error.details.map((detail) => detail.message) });
+  // }
 
   try {
     const referral = await db.Referral.findOne({ where: { id } });
