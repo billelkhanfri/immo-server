@@ -30,34 +30,22 @@ const referralSchema = Joi.object({
   }),
 });
 
-
-// validate update post
+// validate update referral status
 const updateReferralSchema = Joi.object({
-  typeDeReferral: Joi.string().min(3).max(25).messages({
-    "string.empty": "Le Type de referral  ne peut pas être vide",
-    "string.min": "Le Type de referral doit contenir au moins 3 caractères",
-    "string.max": "Le Type de referral doit contenir au maximum 25 caractères",
-    "any.required": "Le Type de referral est requis",
-  }),
-  natureDuContact: Joi.string().min(3).max(25).messages({
-    "string.empty": "La nature du contact ne peut pas être vide",
-    "string.min": "La nature du contact doit contenir au moins 3 caractères",
-    "string.max": "La nature du contact doit contenir au maximum 25 caractères",
-    "any.required": "La nature du contact est requis",
-  }),
+  status: Joi.string()
+    .valid("open", "attribue", "pourparlers", "mondat", "compromis", "acte")
+    .default("open"),
+});
 
-  commentaire: Joi.number().min(8),
-  honnoraire: Joi.string().min(3).max(255).messages({
-    "string.empty": "Le honnoraire ne peut pas être vide",
-    "any.required": "Le honnoraire est requis",
-  }),
-  price: Joi.number().messages({
-    "string.empty": "Le prix ne peut pas être vide",
-    "any.required": "Le prix est requis",
-  }),
+//validate update request of referral
+const updateReferralRequestStatusSchema = Joi.object({
+  status: Joi.string()
+    .valid("pending", "accepted", "rejected")
+    .default("pending"),
 });
 
 module.exports = {
   referralSchema,
   updateReferralSchema,
+  updateReferralRequestStatusSchema,
 };
