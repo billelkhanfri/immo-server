@@ -282,5 +282,41 @@ router.patch(
   verifyToken,
   referralController.updateReferralStatus
 );
+/**
+ * @swagger
+ * /api/myreferrals:
+ *   get:
+ *     summary: Récupérer les referrals de l'utilisateur actuel
+ *     description: Récupère tous les referrals envoyés et reçus par l'utilisateur authentifié.
+ *     tags: [Referrals]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Une liste des referrals envoyés et reçus
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 sentReferrals:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Referral'
+ *                 receivedReferrals:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Referral'
+ *       401:
+ *         description: Non autorisé (token manquant ou invalide)
+ *       500:
+ *         description: Erreur serveur
+ */
+router.get(
+  "/api/myreferrals",
+  verifyToken,
+  referralController.getMyReferrals
+);
+
 
 module.exports = router;

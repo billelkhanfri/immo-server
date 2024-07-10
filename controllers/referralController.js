@@ -5,7 +5,11 @@ const {
 
   updateReferralRequestStatusSchema,
 } = require("../validation/referralValidation");
-
+/**
+ * @desc Récupérer les Referrals
+ * @route GET /api/referrals/
+ * @access Private (only logged in user)
+ */
 const getAllReferrals = async (req, res) => {
   try {
     const referrals = await db.Referral.findAll({
@@ -24,8 +28,13 @@ const getAllReferrals = async (req, res) => {
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
-
 /**
+ * @desc Récupérer Mes referrals (envoyer:reçu)
+ * @route GET /api/myreferrals/
+ * @access Private (only user himself)
+ */
+/**
+ 
  * @desc Récupérer un referral par ID
  * @route GET /api/referrals/:id
  * @access Private (only logged in user)
@@ -58,7 +67,38 @@ const getReferralById = async (req, res) => {
  * @access Private (only user himsSelf)
  */
 
+const getMyReferrals = async (req, res) => {
+  const userId = req.user.id;
 
+  try {
+    const referrals = await db.Referral.findAll({
+      include: [
+        {
+          model: db.User,
+          as: "sender",
+          attributes: { exclude: ["password"] },
+        },
+        {
+          model: db.User,
+          as: "receiver",
+          attributes: { exclude: ["password"] },
+        },
+      ],
+    });
+
+    const sentReferrals = referrals.filter(
+      (referral) => referral.senderId === userId
+    );
+    const receivedReferrals = referrals.filter(
+      (referral) => referral.receiverId === userId
+    );
+
+    res.status(200).json({ sentReferrals, receivedReferrals });
+  } catch (error) {
+    console.error("Erreur serveur:", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
 /**
  * @desc Supprime un referral
  * @route DELETE /api/referrals/:id
@@ -308,5 +348,5 @@ module.exports = {
   getAllReferrals,
   getReferralById,
   deleteReferral,
-  
+  getMyReferrals,
 };
