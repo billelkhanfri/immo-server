@@ -52,6 +52,12 @@ const getReferralById = async (req, res) => {
     res.status(500).json({ eroor: error.message });
   }
 };
+/**
+ * @desc Récupérer mes referral créés
+ * @route GET /api/myreferrals/:id
+ * @access Private (only user himsSelf)
+ */
+
 
 /**
  * @desc Supprime un referral
@@ -120,13 +126,13 @@ const createReferral = async (req, res) => {
   try {
     const referral = await db.Referral.create({
       typeDeReferral,
-      natureDuContact,
+      natureDuContact, 
       commentaire,
       honnoraire,
       price,
       senderId,
       receiverId: receiverId || null,
-      status: receiverId ? "attribue" : "open", // Si receiverId est fourni, le statut est 'attribue', sinon 'open'
+      status: receiverId ? "pending" : "open",
     });
     res.status(201).json({ message: "Referral créé avec succès", referral });
   } catch (error) {
@@ -302,4 +308,5 @@ module.exports = {
   getAllReferrals,
   getReferralById,
   deleteReferral,
+  
 };
