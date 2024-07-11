@@ -156,6 +156,7 @@ const createReferral = async (req, res) => {
   const {
     typeDeReferral,
     natureDuContact,
+    lieu,
     commentaire,
     honnoraire,
     price,
@@ -166,7 +167,8 @@ const createReferral = async (req, res) => {
   try {
     const referral = await db.Referral.create({
       typeDeReferral,
-      natureDuContact, 
+      natureDuContact,
+      lieu,
       commentaire,
       honnoraire,
       price,

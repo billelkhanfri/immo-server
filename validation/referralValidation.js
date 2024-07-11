@@ -14,6 +14,12 @@ const referralSchema = Joi.object({
     "string.max": "La nature du contact doit contenir au maximum 25 caractères",
     "any.required": "La nature du contact est requis",
   }),
+  lieu: Joi.string().min(3).max(25).required().messages({
+    "string.empty": "Le lieu du referral ne peut pas être vide",
+    "string.min": "Le lieu du referral doit contenir au moins 3 caractères",
+    "string.max": "Le lieu du referral doit contenir au maximum 25 caractères",
+    "any.required": "Le lieu du referral est requis",
+  }),
   commentaire: Joi.string().allow("").optional().messages({
     "string.empty": "Le commentaire ne peut pas être vide",
   }),

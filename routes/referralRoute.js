@@ -26,6 +26,10 @@ const { verifyToken } = require("../middlewares/verifyToken");
  *                 type: string
  *                 description: Nature du contact
  *                 example: "contact direct"
+ *               lieu:
+ *                 type: string
+ *                 description: Lieu du referral
+ *                 example: "Toulon"
  *               commentaire:
  *                 type: string
  *                 description: Commentaire sur le referral
@@ -312,11 +316,6 @@ router.patch(
  *       500:
  *         description: Erreur serveur
  */
-router.get(
-  "/api/myreferrals",
-  verifyToken,
-  referralController.getMyReferrals
-);
-
+router.get("/api/myreferrals", verifyToken, referralController.getMyReferrals);
 
 module.exports = router;
