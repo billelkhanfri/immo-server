@@ -14,7 +14,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: "http://192.168.13.230:2000",
+      url: "http://localhost:2000",
       description: "Serveur local",
     },
   ],

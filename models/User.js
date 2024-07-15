@@ -112,7 +112,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       hooks: {
         beforeValidate: (user, options) => {
-          // Trim des champs avant validation
+          // Trim fields before validation
           if (typeof user.lastName === "string") {
             user.lastName = user.lastName.trim();
           }
@@ -128,7 +128,7 @@ module.exports = (sequelize, DataTypes) => {
           if (typeof user.cpi === "string") {
             user.cpi = user.cpi.trim();
           }
-          // Générer un emailVerificationToken si l'email n'est pas vérifié
+          // Generate emailVerificationToken if email is not verified
           if (!user.isEmailVerified && !user.emailVerificationToken) {
             user.emailVerificationToken = uuidv4();
           }
@@ -137,7 +137,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  // Associations avec d'autres modèles
   User.associate = (models) => {
     User.hasOne(models.Profile, {
       foreignKey: "userId",

@@ -19,11 +19,25 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         defaultValue: "",
       },
+      averageRating: {
+        type: DataTypes.VIRTUAL,
+        async get() {
+          const ratings = await this.getRatings(); // Fetch ratings associated with this profile
+          if (ratings && ratings.length > 0) {
+            const total = ratings.reduce(
+              (sum, rating) => sum + rating.ratingValue,
+              0
+            );
+            return total / ratings.length;
+          }
+          return null;
+        },
+      },
     },
     {
       hooks: {
         beforeValidate: (profile, options) => {
-          // Trim des champs avant validation
+          // Trim fields before validation
           if (typeof profile.imageUrl === "string") {
             profile.imageUrl = profile.imageUrl.trim();
           }
@@ -32,7 +46,7 @@ module.exports = (sequelize, DataTypes) => {
           }
         },
         beforeCreate: async (profile, options) => {
-          // Ajout d'un message par défaut pour le champ 'about' si non fourni
+          // Set a default 'about' message if not provided
           if (!profile.about) {
             const user = await profile.getUser();
             if (user) {
@@ -44,11 +58,16 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  // Association avec le modèle 'User'
   Profile.associate = (models) => {
     Profile.belongsTo(models.User, {
       foreignKey: "userId",
       as: "user",
+      onDelete: "CASCADE",
+    });
+
+    Profile.hasMany(models.Rating, {
+      foreignKey: "profileId",
+      as: "ratings",
       onDelete: "CASCADE",
     });
   };

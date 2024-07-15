@@ -41,6 +41,7 @@ const getUserById = async (req, res) => {
       include: {
         model: db.Profile,
         as: "Profile",
+       
       },
       attributes: {
         exclude: ["password"],

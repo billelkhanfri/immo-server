@@ -43,11 +43,13 @@ db.sequelize.sync({ force: false }).then(() => {
 const userRoutes = require("./routes/userRoute");
 const profileRoutes = require("./routes/profileRoute");
 const referralRoutes = require("./routes/referralRoute");
+const ratingsRoutes = require("./routes/ratingsRoutes");
 
-// Use routes with prefixes
+// Use routes with prefixes693
 app.use("/", userRoutes);
 app.use("/", profileRoutes);
 app.use("/", referralRoutes);
+app.use("/", ratingsRoutes);
 
 // Swagger documentation route
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
