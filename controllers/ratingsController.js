@@ -19,11 +19,16 @@ const createRating = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "Utilisateur non trouvé" });
     }
+    const profile = await db.Profile.findOne( {where: { userId }},
+);
+    const averageRating = await profile.averageRating; // Access the virtual field
+    console.log("Average Rating: ", averageRating);
 
     const rating = await db.Rating.create({
       ratingValue,
       profileId: user.Profile.id,
       evaluatorId,
+      userId,
     });
 
     res.status(201).json({

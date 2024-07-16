@@ -35,14 +35,12 @@ const getAllUsers = async (req, res) => {
  * @access Private
  */
 const getUserById = async (req, res) => {
+  const { userId } = req.params;
+
   try {
     const user = await db.User.findOne({
-      where: { id: req.params.id },
-      include: {
-        model: db.Profile,
-        as: "Profile",
-       
-      },
+      where: { id: userId },
+
       attributes: {
         exclude: ["password"],
       },
@@ -52,9 +50,20 @@ const getUserById = async (req, res) => {
       return res.status(404).json({ error: "Utilisateur non trouvé" });
     }
 
-    res.status(200).json(user);
+    const profile = await db.Profile.findOne({ where: { userId } });
+    const averageRating = await profile.averageRating;
+
+    res.status(200).json({
+      success: "Profil récupéré avec succès",
+      user,
+      profile: {
+        ...profile.toJSON(),
+        averageRating,
+      },
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Erreur lors de la récupération du profil:", error);
+    res.status(500).json({ error: "Erreur lors de la récupération du profil" });
   }
 };
 

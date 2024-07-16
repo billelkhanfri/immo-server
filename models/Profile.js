@@ -22,22 +22,35 @@ module.exports = (sequelize, DataTypes) => {
       averageRating: {
         type: DataTypes.VIRTUAL,
         async get() {
-          const ratings = await this.getRatings(); // Fetch ratings associated with this profile
-          if (ratings && ratings.length > 0) {
-            const total = ratings.reduce(
-              (sum, rating) => sum + rating.ratingValue,
-              0
+          try {
+            const ratings = await this.getRatings();
+            console.log("Fetched Ratings: ", ratings);
+            if (ratings && ratings.length > 0) {
+              const total = ratings.reduce(
+                (sum, rating) => sum + rating.ratingValue,
+                0
+              );
+              const average = total / ratings.length;
+              console.log("Calculated Average Rating: ", average);
+              return average;
+            } else {
+              console.log("No ratings found for profile ID: ", this.id);
+              return null;
+            }
+          } catch (error) {
+            console.error(
+              "Error fetching ratings for profile ID: ",
+              this.id,
+              error
             );
-            return total / ratings.length;
+            return null;
           }
-          return null;
         },
       },
     },
     {
       hooks: {
         beforeValidate: (profile, options) => {
-          // Trim fields before validation
           if (typeof profile.imageUrl === "string") {
             profile.imageUrl = profile.imageUrl.trim();
           }
@@ -46,7 +59,6 @@ module.exports = (sequelize, DataTypes) => {
           }
         },
         beforeCreate: async (profile, options) => {
-          // Set a default 'about' message if not provided
           if (!profile.about) {
             const user = await profile.getUser();
             if (user) {
