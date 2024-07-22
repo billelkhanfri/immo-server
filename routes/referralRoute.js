@@ -44,8 +44,8 @@ const { verifyToken } = require("../middlewares/verifyToken");
  *                 example: 200
  *               receiverId:
  *                 type: string
- *                 description: ID du receiver, peut être null
- *                 example: "123e4567-e89b-12d3-a456-426614174000"
+ *                 description: ID du receiver, peut être null ( utilse null si le id est fake)
+ *                 example: null ou id
  *     responses:
  *       201:
  *         description: Referral créé avec succès
