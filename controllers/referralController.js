@@ -144,14 +144,14 @@ const deleteReferral = async (req, res) => {
  * @route POST /api/referrals
  * @access Private (only logged in user)
  */
+
 const createReferral = async (req, res) => {
-  // Validation de la requête
-  const { error } = referralSchema.validate(req.body, { abortEarly: false });
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: error.details.map((detail) => detail.message) });
-  }
+  // const { error } = referralSchema.validate(req.body, { abortEarly: false });
+  // if (error) {
+  //   return res
+  //     .status(400)
+  //     .json({ message: error.details.map((detail) => detail.message) });
+  // }
 
   const {
     typeDeReferral,
@@ -161,10 +161,24 @@ const createReferral = async (req, res) => {
     honnoraire,
     price,
     receiverId,
+    clientInfo, // Les informations du client passées dans la requête
   } = req.body;
   const senderId = req.user.id;
 
   try {
+    // Vérifier si le client existe déjà
+    let client = await db.Client.findOne({ where: { email: clientInfo.email } });
+
+    // Si le client n'existe pas, le créer
+    if (!client) {
+      client = await db.Client.create({
+        nom: clientInfo.nom,
+        email: clientInfo.email,
+        telephone: clientInfo.telephone || null,
+      });
+    }
+
+    // Créer le Referral en associant le client
     const referral = await db.Referral.create({
       typeDeReferral,
       natureDuContact,
@@ -174,14 +188,17 @@ const createReferral = async (req, res) => {
       price,
       senderId,
       receiverId: receiverId || null,
+      clientId: client.id, // Association du client
       status: receiverId ? "pending" : "open",
     });
+
     res.status(201).json({ message: "Referral créé avec succès", referral });
   } catch (error) {
     console.error("Erreur lors de la création du referral:", error);
     res.status(500).json({ error: "Erreur lors de la création du referral" });
   }
 };
+
 
 /**
  * @desc Demander un referral

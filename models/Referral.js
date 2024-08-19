@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     lieu: {
-        type: DataTypes.STRING,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     commentaire: {
@@ -51,9 +51,16 @@ module.exports = (sequelize, DataTypes) => {
       ],
       defaultValue: "open",
     },
+    clientId: {
+      type: DataTypes.UUID,
+      references: { model: "Clients", key: "id" },
+      allowNull: false,
+    },
   });
 
   Referral.associate = (models) => {
+    Referral.belongsTo(models.Client, { foreignKey: 'clientId' });
+
     Referral.belongsTo(models.User, {
       foreignKey: "senderId",
       as: "sender",
