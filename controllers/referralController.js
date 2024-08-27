@@ -16,9 +16,12 @@ const getAllReferrals = async (req, res) => {
       include: {
         model: db.User,
         as: "sender",
-
         attributes: {
           exclude: ["password"],
+        },
+        include: {
+          model: db.Profile,
+          as: "Profile", 
         },
       },
     });
@@ -44,13 +47,34 @@ const getReferralById = async (req, res) => {
   try {
     const referral = await db.Referral.findOne({
       where: { id: req.params.id },
-      include: {
-        model: db.User,
-        as: "sender",
-      },
-      attributes: {
-        exclude: ["password"],
-      },
+      include: [
+        {
+          model: db.User,
+          as: "sender",
+          attributes: {
+            exclude: ["password"],
+          },
+          include: {
+            model: db.Profile,
+            as: "Profile", 
+          },
+        },
+        {
+          model: db.User,
+          as: "receiver",
+          attributes: {
+            exclude: ["password"],
+          },
+          include: {
+            model: db.Profile,
+            as: "Profile", 
+          },
+        },
+        {
+          model : db.Client,
+          as: "client"
+        }
+      ],
     });
 
     if (!referral) {
@@ -167,7 +191,9 @@ const createReferral = async (req, res) => {
 
   try {
     // Vérifier si le client existe déjà
-    let client = await db.Client.findOne({ where: { email: clientInfo.email } });
+    let client = await db.Client.findOne({
+      where: { email: clientInfo.email },
+    });
 
     // Si le client n'existe pas, le créer
     if (!client) {
@@ -198,7 +224,6 @@ const createReferral = async (req, res) => {
     res.status(500).json({ error: "Erreur lors de la création du referral" });
   }
 };
-
 
 /**
  * @desc Demander un referral

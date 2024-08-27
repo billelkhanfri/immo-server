@@ -59,7 +59,9 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Referral.associate = (models) => {
-    Referral.belongsTo(models.Client, { foreignKey: 'clientId' });
+    Referral.belongsTo(models.Client, { foreignKey: 'clientId',
+      as: "client"
+     });
 
     Referral.belongsTo(models.User, {
       foreignKey: "senderId",
