@@ -39,7 +39,15 @@ const referralSchema = Joi.object({
 // validate update referral status
 const updateReferralSchema = Joi.object({
   status: Joi.string()
-    .valid("open", "attribue", "pourparlers", "mondat", "compromis", "acte")
+    .valid(
+      "open",
+      "attribue",
+      "pourparlers",
+      "mondat",
+      "compromis",
+      "acte",
+      "rejected"
+    )
     .default("open"),
 });
 

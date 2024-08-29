@@ -48,6 +48,7 @@ module.exports = (sequelize, DataTypes) => {
         "mondat",
         "compromis",
         "acte",
+        "rejected",
       ],
       defaultValue: "open",
     },
@@ -59,9 +60,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Referral.associate = (models) => {
-    Referral.belongsTo(models.Client, { foreignKey: 'clientId',
-      as: "client"
-     });
+    Referral.belongsTo(models.Client, { foreignKey: "clientId", as: "client" });
 
     Referral.belongsTo(models.User, {
       foreignKey: "senderId",

@@ -278,7 +278,6 @@ const requestReferral = async (req, res) => {
 const updateReferralRequestStatus = async (req, res) => {
   const { id } = req.params; // ID de la demande de referral
   const { status } = req.body; // 'accepted' ou 'rejected'
-
   //Validation de la requête
   const { error } = updateReferralRequestStatusSchema.validate(
     { status },
@@ -292,7 +291,7 @@ const updateReferralRequestStatus = async (req, res) => {
 
   try {
     const referralRequest = await db.ReferralRequest.findOne({
-      where: { id, status: "pending" },
+      where: { id, status:"pending" },
     });
     if (!referralRequest) {
       return res
