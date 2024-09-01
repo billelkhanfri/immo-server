@@ -17,10 +17,12 @@ module.exports = (sequelize, DataTypes) => {
   ReferralRequest.associate = (models) => {
     ReferralRequest.belongsTo(models.Referral, {
       foreignKey: "referralId",
+      as: "referral",
       onDelete: "CASCADE",
     });
     ReferralRequest.belongsTo(models.User, {
       foreignKey: "requesterId",
+      as: "requester",
       onDelete: "CASCADE",
     });
   };

@@ -155,7 +155,7 @@ module.exports = (sequelize, DataTypes) => {
     });
     User.hasMany(models.ReferralRequest, {
       foreignKey: "requesterId",
-      as: "referralRequests",
+      as: "sentRequest",
       onDelete: "CASCADE",
     });
      User.hasMany(models.Rating, {

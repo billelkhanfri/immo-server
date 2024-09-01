@@ -148,7 +148,7 @@ const loginUser = async (req, res) => {
     const token = jwt.sign(
       { id: existingUser.id, isAdmin: existingUser.isAdmin },
       process.env.SECRET_KEY,
-      { expiresIn: "4h" }
+     
     );
 
     res.status(200).json({

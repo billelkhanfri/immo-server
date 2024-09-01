@@ -44,12 +44,15 @@ const userRoutes = require("./routes/userRoute");
 const profileRoutes = require("./routes/profileRoute");
 const referralRoutes = require("./routes/referralRoute");
 const ratingsRoutes = require("./routes/ratingsRoutes");
+const requestRoutes =  require("./routes/requestRoute")
 
 // Use routes with prefixes693
 app.use("/", userRoutes);
 app.use("/", profileRoutes);
 app.use("/", referralRoutes);
 app.use("/", ratingsRoutes);
+app.use("/", requestRoutes);
+
 
 // Swagger documentation route
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

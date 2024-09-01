@@ -8,7 +8,7 @@ module.exports = {
     database: process.env.LOCAL_DB_NAME || "immo",
     host: process.env.LOCAL_DB_HOST || "127.0.0.1",
     port: process.env.LOCAL_DB_PORT || 3306,
-    dialect: "mariadb",
+    dialect: "mysql",
   },
   production: {
     username: process.env.MYSQL_ADDON_USER,
