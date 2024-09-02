@@ -31,13 +31,8 @@ const getAllReferrals = async (req, res) => {
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
+
 /**
- * @desc Récupérer Mes referrals (envoyer:reçu)
- * @route GET /api/myreferrals/
- * @access Private (only user himself)
- */
-/**
- 
  * @desc Récupérer un referral par ID
  * @route GET /api/referrals/:id
  * @access Private (only logged in user)
@@ -220,7 +215,6 @@ const createReferral = async (req, res) => {
 
     res.status(201).json({ message: "Referral créé avec succès", referral });
   } catch (error) {
-    console.error("Erreur lors de la création du referral:", error);
     res.status(500).json({ error: "Erreur lors de la création du referral" });
   }
 };
@@ -270,70 +264,7 @@ const requestReferral = async (req, res) => {
   }
 };
 
-/**
- * @desc Mettre à jour le statut d'une demande de referral
- * @route PATCH /api/referrals/requests/:id
- * @access Private (only logged in user)
- */
-const updateReferralRequestStatus = async (req, res) => {
-  const { id } = req.params; // ID de la demande de referral
-  const { status } = req.body; // 'accepted' ou 'rejected'
-  //Validation de la requête
-  const { error } = updateReferralRequestStatusSchema.validate(
-    { status },
-    { abortEarly: false }
-  );
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: error.details.map((detail) => detail.message) });
-  }
 
-  try {
-    const referralRequest = await db.ReferralRequest.findOne({
-      where: { id, status:"pending" },
-    });
-    if (!referralRequest) {
-      return res
-        .status(404)
-        .json({ message: "Demande de referral non trouvée ou déjà traitée" });
-    }
-
-    referralRequest.status = status;
-    await referralRequest.save();
-
-    if (status === "accepted") {
-      const referral = await db.Referral.findOne({
-        where: { id: referralRequest.referralId },
-      });
-      if (!referral) {
-        return res.status(404).json({ message: "Referral non trouvé" });
-      }
-
-      referral.receiverId = referralRequest.requesterId;
-      referral.status = "attribue";
-      await referral.save();
-
-      await db.ReferralRequest.update(
-        { status: "rejected" },
-        { where: { referralId: referral.id, status: "pending" } }
-      );
-    }
-
-    res.status(200).json({
-      message: "Statut de la demande de referral mis à jour",
-      referralRequest,
-    });
-  } catch (error) {
-    console.error(
-      "Erreur lors de la mise à jour de la demande de referral:",
-      error
-    );
-    res.status(500).json({
-      error: "Erreur lors de la mise à jour de la demande de referral",
-    });
-  }
-};
 
 /**
  * @desc Mettre à jour le statut d'un referral
@@ -386,7 +317,7 @@ const updateReferralStatus = async (req, res) => {
 module.exports = {
   createReferral,
   requestReferral,
-  updateReferralRequestStatus,
+
   updateReferralStatus,
   getAllReferrals,
   getReferralById,

@@ -86,7 +86,7 @@ const createUser = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.SECRET_KEY,
-      { expiresIn: "4h" }
+    
     );
 
     res.status(201).json({
