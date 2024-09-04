@@ -23,7 +23,7 @@ const getRequestById = async (req, res) => {
   try {
     const { id } = req.params;
     const referralRequest = await db.ReferralRequest.findOne({
-      where: { referralId: req.params.id },
+      where: { referralId: id },
       include: [
         {
           model: db.User,
@@ -73,53 +73,45 @@ const updateReferralRequestStatus = async (req, res) => {
   //     .json({ message: error.details.map((detail) => detail.message) });
   // }
 
-  try {
-    // Trouver la demande de referral en attente
-    const referralRequest = await db.ReferralRequest.findOne({
-      where: { id, status: "pending" },
-    });
-    if (!referralRequest) {
-      return res
-        .status(404)
-        .json({ message: "Demande de referral non trouvée ou déjà traitée" });
-    }
 
-    // Mettre à jour le statut de la demande de referral
-    referralRequest.status = status;
-    await referralRequest.save();
-
-    if (status === "accepted") {
-      // Si la demande est acceptée, mettre à jour le referral associé
-      const referral = await db.Referral.findOne({
-        where: { id: referralRequest.referralId },
+  
+    try {
+      const referralRequest = await db.ReferralRequest.findOne({
+        where: { id, status: "pending" },
       });
-      if (!referral) {
-        return res.status(404).json({ message: "Referral non trouvé" });
+  
+      if (!referralRequest) {
+        return res.status(404).json({ message: "Demande de referral non trouvée ou déjà traitée" });
       }
-
-      referral.receiverId = referralRequest.requesterId;
-      referral.status = "attribue";
-      await referral.save();
-    } else if (status === "rejected") {
-      // Si la demande est rejetée, aucune action supplémentaire n'est nécessaire sur le referral
+  
+      referralRequest.status = status;
+      await referralRequest.save();
+  
+      if (status === "accepted") {
+        const referral = await db.Referral.findOne({
+          where: { id: referralRequest.referralId },
+        });
+  
+        if (!referral) {
+          return res.status(404).json({ message: "Referral non trouvé" });
+        }
+  
+        referral.receiverId = referralRequest.requesterId;
+        referral.status = "attribue";
+        await referral.save();
+      }
+  
       res.status(200).json({
-        message: "Demande de referral rejetée avec succès",
+        message: `Statut de la demande de referral ${status === 'accepted' ? 'acceptée' : 'rejetée'} avec succès`,
         referralRequest,
       });
-      return;
+  
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de la demande de referral:", error);
+      res.status(500).json({ error: "Erreur lors de la mise à jour de la demande de referral" });
     }
-
-    res.status(200).json({
-      message: "Statut de la demande de referral mis à jour avec succès",
-      referralRequest,
-    });
-  } catch (error) {
-    console.error("Erreur lors de la mise à jour de la demande de referral:", error);
-    res.status(500).json({
-      error: "Erreur lors de la mise à jour de la demande de referral",
-    });
-  }
-};
+  };
+  
 
 module.exports = {
   getAllRequests,
