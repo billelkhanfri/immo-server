@@ -21,7 +21,7 @@ const getAllReferrals = async (req, res) => {
         },
         include: {
           model: db.Profile,
-          as: "Profile", 
+          as: "Profile",
         },
       },
     });
@@ -51,7 +51,7 @@ const getReferralById = async (req, res) => {
           },
           include: {
             model: db.Profile,
-            as: "Profile", 
+            as: "Profile",
           },
         },
         {
@@ -62,13 +62,13 @@ const getReferralById = async (req, res) => {
           },
           include: {
             model: db.Profile,
-            as: "Profile", 
+            as: "Profile",
           },
         },
         {
-          model : db.Client,
-          as: "client"
-        }
+          model: db.Client,
+          as: "client",
+        },
       ],
     });
 
@@ -210,7 +210,7 @@ const createReferral = async (req, res) => {
       senderId,
       receiverId: receiverId || null,
       clientId: client.id, // Association du client
-      status: receiverId ? "pending" : "open",
+      status: receiverId ? "en attente" : "envoyé",
     });
 
     res.status(201).json({ message: "Referral créé avec succès", referral });
@@ -263,8 +263,6 @@ const requestReferral = async (req, res) => {
     res.status(500).json({ error: "Erreur lors de la demande de referral" });
   }
 };
-
-
 
 /**
  * @desc Mettre à jour le statut d'un referral
