@@ -239,7 +239,7 @@ const requestReferral = async (req, res) => {
         .json({ message: "vous avez déja envoyer une demande a ce referral" });
     }
     const referral = await db.Referral.findOne({
-      where: { id, status: "open" },
+      where: { id, status: "envoyé" },
     });
     if (!referral) {
       return res
