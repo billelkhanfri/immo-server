@@ -77,7 +77,7 @@ const updateReferralRequestStatus = async (req, res) => {
   
     try {
       const referralRequest = await db.ReferralRequest.findOne({
-        where: { id, status: "pending" },
+        where: { id, status: "envoyé" },
       });
   
       if (!referralRequest) {
@@ -97,7 +97,7 @@ const updateReferralRequestStatus = async (req, res) => {
         }
   
         referral.receiverId = referralRequest.requesterId;
-        referral.status = "attribue";
+        referral.status = "attribué";
         await referral.save();
       }
   
