@@ -132,7 +132,7 @@ const updateReferralRequestStatus = async (req, res) => {
     res.status(500).json({ error: "Erreur lors de la mise à jour de la demande de referral" });
   }
   
-
+}
 module.exports = {
   getAllRequests,
   getRequestById,
