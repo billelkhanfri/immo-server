@@ -22,6 +22,14 @@ const getAllRequests = async (req, res) => {
         {
           model: db.Referral,
           as: "referral",
+          include: {
+            model: db.User,
+            as: "sender", 
+            include: {
+              model: db.Profile,
+              as: "Profile", 
+            },
+          },
         }
       ],
     });
@@ -57,6 +65,10 @@ const getRequestById = async (req, res) => {
         {
           model: db.Referral,
           as: "referral",
+          include: {
+            model: db.User,
+            as: "sender", 
+          },
         }
       ],
     });

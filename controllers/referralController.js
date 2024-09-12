@@ -273,16 +273,16 @@ const updateReferralStatus = async (req, res) => {
   const { id } = req.params; // id du Referral
   const { status } = req.body;
 
-  //Validation de la requête
-  const { error } = updateReferralSchema.validate(
-    { status },
-    { abortEarly: false }
-  );
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: error.details.map((detail) => detail.message) });
-  }
+  // //Validation de la requête
+  // const { error } = updateReferralSchema.validate(
+  //   { status },
+  //   { abortEarly: false }
+  // );
+  // if (error) {
+  //   return res
+  //     .status(400)
+  //     .json({ message: error.details.map((detail) => detail.message) });
+  // }
 
   try {
     const referral = await db.Referral.findOne({ where: { id } });
