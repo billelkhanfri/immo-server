@@ -157,11 +157,11 @@ router.get(
  *       500:
  *         description: Erreur serveur
  */
-// router.put(
-//   "/api/referrals/:id",
-//   verifyToken,
-//   referralController.updateReferral
-// );
+ router.put(
+   "/api/referrals/:id",
+   verifyToken,
+   referralController.updateReferral
+ );
 
 /**
  * @swagger

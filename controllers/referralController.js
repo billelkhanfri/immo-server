@@ -311,11 +311,69 @@ const updateReferralStatus = async (req, res) => {
       .json({ error: "Erreur lors de la mise à jour du statut du referral" });
   }
 };
+/**
+ * @desc Mettre à jour un referral
+ * @route PUT /api/referrals/:id
+ * @access Private (only logged in user)
+ */
+const updateReferral = async (req, res) => {
+  const { id } = req.params; // ID du referral
+  const {
+    typeDeReferral,
+    natureDuContact,
+    lieu,
+    commentaire,
+    honnoraire,
+    price,
+    receiverId,
+    status,
+  } = req.body;
+
+  // // Validation de la requête (décommenter si validation ajoutée)
+  // const { error } = updateReferralSchema.validate(req.body, { abortEarly: false });
+  // if (error) {
+  //   return res.status(400).json({ message: error.details.map((detail) => detail.message) });
+  // }
+
+  try {
+    // Récupérer le referral existant
+    const referral = await db.Referral.findOne({ where: { id } });
+
+    if (!referral) {
+      return res.status(404).json({ message: "Referral non trouvé" });
+    }
+
+    // Vérification des autorisations (optionnel : à adapter selon les rôles)
+    if (req.user.id !== referral.senderId) {
+      return res.status(403).json({
+        message: "Vous n'êtes pas autorisé à modifier ce referral",
+      });
+    }
+
+    // Mise à jour du referral avec les nouvelles données
+    referral.typeDeReferral = typeDeReferral || referral.typeDeReferral;
+    referral.natureDuContact = natureDuContact || referral.natureDuContact;
+    referral.lieu = lieu || referral.lieu;
+    referral.commentaire = commentaire || referral.commentaire;
+    referral.honnoraire = honnoraire || referral.honnoraire;
+    referral.price = price || referral.price;
+    referral.receiverId = receiverId || referral.receiverId;
+    referral.status = status || referral.status;
+
+    // Sauvegarder les modifications
+    await referral.save();
+
+    res.status(200).json({ message: "Referral mis à jour avec succès", referral });
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du referral:", error);
+    res.status(500).json({ error: "Erreur lors de la mise à jour du referral" });
+  }
+};
 
 module.exports = {
   createReferral,
   requestReferral,
-
+updateReferral,
   updateReferralStatus,
   getAllReferrals,
   getReferralById,
