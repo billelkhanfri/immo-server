@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       allowNull: true, // Peut être null initialement
     },
-    status: {
+    globalStatus: {
       type: DataTypes.ENUM,
       values: [
         "envoyé",
@@ -48,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
         "mandat",
         "compromis",
         "acte",
-        "rejeté",
+       
       ],
       defaultValue: "envoyé",
     },
@@ -75,6 +75,13 @@ module.exports = (sequelize, DataTypes) => {
     Referral.hasMany(models.ReferralRequest, {
       foreignKey: "referralId",
       as: "receivedRequest",
+      onDelete: "CASCADE",
+    });
+
+     // New association with ReferralUserStatus
+     Referral.hasMany(models.ReferralUserStatus, {
+      foreignKey: "referralId",
+      as: "userStatuses",
       onDelete: "CASCADE",
     });
   };
