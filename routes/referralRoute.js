@@ -293,4 +293,11 @@ router.patch(
  */
 router.get("/api/myreferrals", verifyToken, referralController.getMyReferrals);
 
+
+
+router.post(
+  "/api/referrals/:id/attribute",
+  verifyToken,
+  referralController.attributeReferral
+);
 module.exports = router;

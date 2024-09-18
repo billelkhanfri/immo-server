@@ -172,13 +172,25 @@ const createReferral = async (req, res) => {
   //     .json({ message: error.details.map((detail) => detail.message) });
   // }
 
-  const { typeDeReferral, natureDuContact, lieu, commentaire, honnoraire, price, receiverId, clientInfo } = req.body;
+  const {
+    typeDeReferral,
+    natureDuContact,
+    lieu,
+    commentaire,
+    honnoraire,
+    price,
+    receiverId,
+    clientInfo, // Les informations du client passées dans la requête
+  } = req.body;
   const senderId = req.user.id;
 
   try {
     // Vérifier si le client existe déjà
-    let client = await db.Client.findOne({ where: { email: clientInfo.email } });
+    let client = await db.Client.findOne({
+      where: { email: clientInfo.email },
+    });
 
+    // Si le client n'existe pas, le créer
     if (!client) {
       client = await db.Client.create({
         nom: clientInfo.nom,
@@ -187,7 +199,7 @@ const createReferral = async (req, res) => {
       });
     }
 
-    // Créer le Referral avec statut global "envoyé" ou "en attente"
+    // Créer le Referral en associant le client
     const referral = await db.Referral.create({
       typeDeReferral,
       natureDuContact,
@@ -197,29 +209,61 @@ const createReferral = async (req, res) => {
       price,
       senderId,
       receiverId: receiverId || null,
-      clientId: client.id,
-      globalStatus: receiverId ? "en attente" : "envoyé", // Set global status
+      clientId: client.id, // Association du client
+      status: receiverId ? "en attente" : "envoyé",
     });
-
-    // Créer ReferralUserStatus pour le sender avec statut "envoyé"
-    await db.ReferralUserStatus.create({
-      userId: senderId,
-      referralId: referral.id,
-      status: "envoyé",
-    });
-
-    // Si un receiver est spécifié, créer ReferralUserStatus pour le receiver
-    if (receiverId) {
-      await db.ReferralUserStatus.create({
-        userId: receiverId,
-        referralId: referral.id,
-        status: "en attente", // Initial status for the receiver
-      });
-    }
 
     res.status(201).json({ message: "Referral créé avec succès", referral });
   } catch (error) {
     res.status(500).json({ error: "Erreur lors de la création du referral" });
+  }
+};
+
+
+/**
+ * @desc Attribuer un referral
+ * @route POST /api/referrals/:id/attribute
+ * @access Private (only logged in user)
+ */
+const attributeReferral = async (req, res) => {
+  const { id } = req.params; // ID du referral
+  const requesterId = req.user.id;
+
+  const { receiverId } = req.body;
+
+  try {
+    const isExistingAttribute = await db.ReferralAttributes.findOne({
+      where: { requesterId, referralId: id, receiverId },
+    });
+
+    if (isExistingAttribute) {
+      return res
+        .status(401)
+        .json({ message: "vous avez déja envoyer une demande a ce referral" });
+    }
+    const referral = await db.Referral.findOne({
+      where: { id, status: "envoyé" },
+    });
+    if (!referral) {
+      return res
+        .status(404)
+        .json({ message: "Referral non trouvé ou déjà attribué" });
+    }
+    const { senderId } = referral;
+    const referralAttribute = await db.ReferralAttributes.create({
+      referralId: id,
+      receiverId,
+      status: "pending",
+      senderId,
+    });
+
+    res.status(201).json({
+      message: "Demande de referral envoyée avec succès",
+      referralAttribute,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la demande de referral:", error);
+    res.status(500).json({ error: "Erreur lors de la demande de referral" });
   }
 };
 
@@ -290,46 +334,29 @@ const updateReferralStatus = async (req, res) => {
 
   try {
     const referral = await db.Referral.findOne({ where: { id } });
-
     if (!referral) {
       return res.status(404).json({ message: "Referral non trouvé" });
     }
-
-    // Vérifier que le referral a un receiver assigné
     if (referral.receiverId === null) {
       return res.status(403).json({
-        message: "Il faut une attribution du referral avant de continuer",
+        message: "il faut une attribution du referral avant de continuer",
       });
     }
 
-    // Mettre à jour le ReferralUserStatus pour cet utilisateur
-    await db.ReferralUserStatus.update(
-      { status },
-      { where: { userId, referralId: id } }
-    );
+    referral.status = status;
+    await referral.save();
 
-    // Si le statut est autre que "rejeté", mettre à jour le statut global et rejeter les autres
-    if (status !== "rejeté") {
-      // Mettre à jour le statut global du Referral
-      referral.globalStatus = status;
-      await referral.save();
-
-      // Rejeter tous les autres utilisateurs pour ce referral
-      await db.ReferralUserStatus.update(
-        { status: "rejeté" },
-        {
-          where: {
-            referralId: id,
-            userId: { [db.Sequelize.Op.ne]: userId }, // Exclure l'utilisateur actuel
-          },
-        }
-      );
-    }
-
-    res.status(200).json({ message: "Statut du referral mis à jour", referral });
+    res
+      .status(200)
+      .json({ message: "Statut du referral mis à jour", referral });
   } catch (error) {
-    console.error("Erreur lors de la mise à jour du statut du referral:", error);
-    res.status(500).json({ error: "Erreur lors de la mise à jour du statut du referral" });
+    console.error(
+      "Erreur lors de la mise à jour du statut du referral:",
+      error
+    );
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la mise à jour du statut du referral" });
   }
 };
 /**
@@ -400,4 +427,5 @@ updateReferral,
   getReferralById,
   deleteReferral,
   getMyReferrals,
+  attributeReferral
 };
