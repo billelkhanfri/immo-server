@@ -219,53 +219,46 @@ const createReferral = async (req, res) => {
   }
 };
 
-
-/**
- * @desc Attribuer un referral
- * @route POST /api/referrals/:id/attribute
- * @access Private (only logged in user)
- */
 const attributeReferral = async (req, res) => {
-  const { id } = req.params; // ID du referral
-  const requesterId = req.user.id;
-
-  const { receiverId } = req.body;
+  const { id } = req.params; // ID of the referral
+  const senderId = req.user.id; // The logged-in user (sender)
+  const { receivedId } = req.body; // The user who will receive the referral
 
   try {
     const isExistingAttribute = await db.ReferralAttributes.findOne({
-      where: { requesterId, referralId: id, receiverId },
+      where: { referralId: id, receivedId },
     });
 
     if (isExistingAttribute) {
-      return res
-        .status(401)
-        .json({ message: "vous avez déja envoyer une demande a ce referral" });
+      return res.status(401).json({ message: "You have already sent a request to this referral" });
     }
+
     const referral = await db.Referral.findOne({
       where: { id, status: "envoyé" },
     });
+
     if (!referral) {
-      return res
-        .status(404)
-        .json({ message: "Referral non trouvé ou déjà attribué" });
+      return res.status(404).json({ message: "Referral not found or already attributed" });
     }
-    const { senderId } = referral;
+
     const referralAttribute = await db.ReferralAttributes.create({
       referralId: id,
-      receiverId,
+      receivedId,   // The receiving user
+      senderId,     // The posting user (foreign key)
       status: "pending",
-      senderId,
     });
 
     res.status(201).json({
-      message: "Demande de referral envoyée avec succès",
+      message: "Referral request sent successfully",
       referralAttribute,
     });
   } catch (error) {
-    console.error("Erreur lors de la demande de referral:", error);
-    res.status(500).json({ error: "Erreur lors de la demande de referral" });
+    console.error("Error while sending referral request:", error);
+    res.status(500).json({ error: "Error while sending referral request" });
   }
 };
+
+
 
 /**
  * @desc Demander un referral
@@ -411,21 +404,25 @@ const updateReferral = async (req, res) => {
     // Sauvegarder les modifications
     await referral.save();
 
-    res.status(200).json({ message: "Referral mis à jour avec succès", referral });
+    res
+      .status(200)
+      .json({ message: "Referral mis à jour avec succès", referral });
   } catch (error) {
     console.error("Erreur lors de la mise à jour du referral:", error);
-    res.status(500).json({ error: "Erreur lors de la mise à jour du referral" });
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la mise à jour du referral" });
   }
 };
 
 module.exports = {
   createReferral,
   requestReferral,
-updateReferral,
+  updateReferral,
   updateReferralStatus,
   getAllReferrals,
   getReferralById,
   deleteReferral,
   getMyReferrals,
-  attributeReferral
+  attributeReferral,
 };

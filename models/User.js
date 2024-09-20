@@ -163,11 +163,16 @@ module.exports = (sequelize, DataTypes) => {
       as: "receivedAttribute",
       onDelete: "CASCADE",
     });
-     User.hasMany(models.Rating, {
-       foreignKey: "userId",
-       as: "ratings",
-       onDelete: "CASCADE",
-     });
+    User.hasMany(models.Rating, {
+      foreignKey: "userId",
+      as: "ratings",
+      onDelete: "CASCADE",
+    });
+    User.hasMany(models.ReferralAttributes, {
+      foreignKey: "senderId",
+      as: "sender",
+      onDelete: "CASCADE",
+    });
   };
 
   return User;
