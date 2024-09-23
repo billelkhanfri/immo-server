@@ -165,13 +165,6 @@ const deleteReferral = async (req, res) => {
  */
 
 const createReferral = async (req, res) => {
-  // const { error } = referralSchema.validate(req.body, { abortEarly: false });
-  // if (error) {
-  //   return res
-  //     .status(400)
-  //     .json({ message: error.details.map((detail) => detail.message) });
-  // }
-
   const {
     typeDeReferral,
     natureDuContact,
@@ -180,7 +173,7 @@ const createReferral = async (req, res) => {
     honnoraire,
     price,
     receiverId,
-    clientInfo, // Les informations du client passées dans la requête
+    clientInfo,
   } = req.body;
   const senderId = req.user.id;
 
@@ -209,15 +202,27 @@ const createReferral = async (req, res) => {
       price,
       senderId,
       receiverId: receiverId || null,
-      clientId: client.id, // Association du client
-      status: receiverId ? "en attente" : "envoyé",
+      clientId: client.id,
+      
     });
+
+    // Si un receiverId est fourni, créer une ligne dans ReferralAttributes
+    if (receiverId) {
+      await db.ReferralAttributes.create({
+        referralId: referral.id,
+        senderId,
+        receivedId :receiverId,
+        status: "pending",  // Statut initial dans ReferralAttributes
+      });
+    }
 
     res.status(201).json({ message: "Referral créé avec succès", referral });
   } catch (error) {
+    console.error("Erreur lors de la création du referral:", error);
     res.status(500).json({ error: "Erreur lors de la création du referral" });
   }
 };
+
 
 const attributeReferral = async (req, res) => {
   const { id } = req.params; // ID of the referral
@@ -238,7 +243,7 @@ const attributeReferral = async (req, res) => {
     });
 
     if (!referral) {
-      return res.status(404).json({ message: "Referral not found or already attributed" });
+      return res.status(404).json({ message: "Referral introuvable ou déjà attribué" });
     }
 
     const referralAttribute = await db.ReferralAttributes.create({
