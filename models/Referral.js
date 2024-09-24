@@ -57,6 +57,14 @@ module.exports = (sequelize, DataTypes) => {
       references: { model: "Clients", key: "id" },
       allowNull: false,
     },
+    isPending : {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    isRequested : {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    }
   });
 
   Referral.associate = (models) => {

@@ -15,10 +15,23 @@ const getAllAttributes = async (req,res) => {
           model: db.User,
           as: "received",
           attributes: { exclude: ["password"] },
+          include: {
+            model: db.Profile,
+            as: "Profile",
+          },
         },
         {
           model: db.User,
           as: "sender",
+          attributes: { exclude: ["password"] },
+          include: {
+            model: db.Profile,
+            as: "Profile",
+          },
+        },
+        {
+          model: db.Referral,
+          as: "referral",
           attributes: { exclude: ["password"] },
         },
       ],

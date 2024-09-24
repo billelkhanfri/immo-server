@@ -201,7 +201,7 @@ const createReferral = async (req, res) => {
       honnoraire,
       price,
       senderId,
-      receiverId: receiverId || null,
+      receiverId: null,
       clientId: client.id,
       
     });
@@ -211,8 +211,8 @@ const createReferral = async (req, res) => {
       await db.ReferralAttributes.create({
         referralId: referral.id,
         senderId,
-        receivedId :receiverId,
-        status: "pending",  // Statut initial dans ReferralAttributes
+        receivedId: receiverId,
+        status: "pending", // Statut initial dans ReferralAttributes
       });
     }
 
@@ -223,38 +223,48 @@ const createReferral = async (req, res) => {
   }
 };
 
-
 const attributeReferral = async (req, res) => {
   const { id } = req.params; // ID of the referral
   const senderId = req.user.id; // The logged-in user (sender)
   const { receivedId } = req.body; // The user who will receive the referral
 
   try {
+    // Check if the referral has already been attributed to this receiver
     const isExistingAttribute = await db.ReferralAttributes.findOne({
       where: { referralId: id, receivedId },
     });
 
     if (isExistingAttribute) {
-      return res.status(401).json({ message: "You have already sent a request to this referral" });
+      return res
+        .status(401)
+        .json({ message: "You have already sent a request to this referral" });
     }
 
+    // Fetch the referral with the status "envoyé"
     const referral = await db.Referral.findOne({
       where: { id, status: "envoyé" },
     });
 
     if (!referral) {
-      return res.status(404).json({ message: "Referral introuvable ou déjà attribué" });
+      return res
+        .status(404)
+        .json({ message: "Referral introuvable ou déjà attribué" });
     }
 
+    // Create a ReferralAttributes entry with "pending" status
     const referralAttribute = await db.ReferralAttributes.create({
       referralId: id,
-      receivedId,   // The receiving user
-      senderId,     // The posting user (foreign key)
+      receivedId, // The receiving user
+      senderId, // The posting user (foreign key)
       status: "pending",
     });
 
+    // Set isPending to true when status is "pending"
+    referral.isPending = true;
+    await referral.save(); // Save the updated referral
+
     res.status(201).json({
-      message: "Referral request sent successfully",
+      message: "Referral request sent successfully and is now pending",
       referralAttribute,
     });
   } catch (error) {
@@ -262,7 +272,6 @@ const attributeReferral = async (req, res) => {
     res.status(500).json({ error: "Error while sending referral request" });
   }
 };
-
 
 
 /**
