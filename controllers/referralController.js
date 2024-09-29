@@ -192,6 +192,9 @@ const createReferral = async (req, res) => {
       });
     }
 
+    // Définir isPending à true si receiverId est fourni
+    const isPending = !!receiverId;
+
     // Créer le Referral en associant le client
     const referral = await db.Referral.create({
       typeDeReferral,
@@ -201,9 +204,9 @@ const createReferral = async (req, res) => {
       honnoraire,
       price,
       senderId,
-      receiverId: null,
+      receiverId:  null,
       clientId: client.id,
-      
+      isPending, // Définit isPending à true si receiverId est présent
     });
 
     // Si un receiverId est fourni, créer une ligne dans ReferralAttributes
@@ -222,6 +225,7 @@ const createReferral = async (req, res) => {
     res.status(500).json({ error: "Erreur lors de la création du referral" });
   }
 };
+
 
 const attributeReferral = async (req, res) => {
   const { id } = req.params; // ID of the referral

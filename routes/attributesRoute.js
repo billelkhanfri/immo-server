@@ -9,5 +9,7 @@ router.get(
   attributeReferral.getAllAttributes
 );
 router.get("/api/referrals-attributes/:id", verifyToken, attributeReferral.getAttributeById);
+router.put('/api/referrals-attributes/:id',verifyToken, attributeReferral.updateReferralAttributeStatus);
+
 
 module.exports = router;

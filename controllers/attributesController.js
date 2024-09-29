@@ -95,9 +95,56 @@ const getAttributeById = async (req, res) => {
     res.status(500).json({ error: process.env.NODE_ENV === 'development' ? error.message : "Erreur serveur" });
   }
 };
+/**
+ * @desc Mettre à jour le statut d'un ReferralAttributes
+ * @route PUT /api/referrals-attributes/:id
+ * @access Private (only logged in user)
+ */
+const updateReferralAttributeStatus = async (req, res) => {
+  const { id } = req.params; // ReferralAttribute ID
+  const { status } = req.body; // "accepted" or "rejected"
+  const userId = req.user.id;
 
+  try {
+    // Fetch the ReferralAttribute by ID
+    const referralAttribute = await db.ReferralAttributes.findOne({ 
+      where: { referralId: id , receivedId : userId}});
+
+    if (!referralAttribute) {
+      return res.status(404).json({ error: "ReferralAttribute introuvable" });
+    }
+
+    // Update the status to either accepted or rejected
+    referralAttribute.status = status;
+    await referralAttribute.save();
+
+    // If the status is "accepted", update the Referral's status to "attribué"
+    if (status === "accepted") {
+      const referral = await db.Referral.findByPk(referralAttribute.referralId);
+
+      if (!referral) {
+        return res.status(404).json({ error: "Referral introuvable" });
+      }
+
+      referral.status = "attribué"
+      referral.isPending = false;
+      referral.receiverId = referralAttribute.receivedId
+      await referral.save();
+    }
+
+    // Return the updated ReferralAttribute
+    res.status(200).json({
+      message: `ReferralAttribute mis à jour avec le statut ${status}`,
+      referralAttribute,
+    });
+  } catch (error) {
+    console.error("Erreur serveur:", error);
+    res.status(500).json({ error: "Erreur serveur lors de la mise à jour du ReferralAttribute" });
+  }
+};
 
 module.exports = {
   getAttributeById,
-  getAllAttributes
+  getAllAttributes,  updateReferralAttributeStatus,
+
 };
