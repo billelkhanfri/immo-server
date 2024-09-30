@@ -476,7 +476,7 @@ router.delete("/api/users/:id", verifyToken, userController.deleteUser);
  *       500:
  *         description: Erreur serveur.
  */
-router.get("/api/verify-email/:token", authController.verifyEmail);
+router.get("/api/:userId/verify-email/:token", authController.verifyEmail);
 
 /**
  * @swagger

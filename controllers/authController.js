@@ -75,7 +75,7 @@ const createUser = async (req, res) => {
     });
 
     // Créer le lien de vérification d'email
-    const verificationUrl = `http://localhost:${process.env.PORT}/api/verify-email/${emailVerificationToken}`;
+    const verificationUrl = `http://localhost:5173/inscription/${user.id}/verify-email/${emailVerificationToken}`;
     await sendEmail(
       email,
       "Email de vérification",
@@ -85,8 +85,7 @@ const createUser = async (req, res) => {
     // Générer un token JWT
     const token = jwt.sign(
       { id: user.id, email: user.email },
-      process.env.SECRET_KEY,
-    
+      process.env.SECRET_KEY
     );
 
     res.status(201).json({
@@ -108,9 +107,7 @@ const loginUser = async (req, res) => {
   // Validation du corps de la requête avec le schéma Joi
   const { error } = loginSchema.validate(req.body, { abortEarly: false });
   if (error) {
-    return res
-      .status(400)
-      .json({ errors: error.details.map((detail) => detail.message) });
+    return res.status(400).json({ errors: error.details.map((detail) => detail.message) });
   }
 
   const { emailOrCpi, password } = req.body;
@@ -127,28 +124,28 @@ const loginUser = async (req, res) => {
       },
     });
 
+    // Assurez-vous que `existingUser` est défini
     if (!existingUser) {
-      return res
-        .status(400)
-        .json({ error: "Email/cpi ou mot de passe invalides." });
+      return res.status(400).json({ error: "Email/cpi ou mot de passe invalides." });
     }
 
     // Vérifier le mot de passe
-    const isPasswordMatch = await bcrypt.compare(
-      password,
-      existingUser.password
-    );
+    const isPasswordMatch = await bcrypt.compare(password, existingUser.password);
     if (!isPasswordMatch) {
-      return res
-        .status(400)
-        .json({ error: "Email/cpi ou mot de passe invalides." });
+      return res.status(400).json({ error: "Email/cpi ou mot de passe invalides." });
+    }
+
+    // Vérifiez si l'email a été vérifié
+    if (!existingUser.isEmailVerified) {
+      return res.status(400).json({
+        message: "Un email de vérification a été envoyé, veuillez le vérifier.",
+      });
     }
 
     // Générer un token JWT
     const token = jwt.sign(
       { id: existingUser.id, isAdmin: existingUser.isAdmin },
-      process.env.SECRET_KEY,
-     
+      process.env.SECRET_KEY
     );
 
     res.status(200).json({
@@ -164,14 +161,15 @@ const loginUser = async (req, res) => {
   }
 };
 
+
 /**
  * @desc Vérification de l'email de l'utilisateur
- * @route GET /api/verify-email/:token
+ * @route GET /api/:userId/verify-email/:token
  * @method GET
  * @access Public
  */
 const verifyEmail = async (req, res) => {
-  const { token } = req.params;
+  const { userId, token } = req.params;
   try {
     const user = await db.User.findOne({
       where: { emailVerificationToken: token },
