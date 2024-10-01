@@ -15,13 +15,11 @@ const { Op } = require("sequelize");
  * @access Public
  */
 const createUser = async (req, res) => {
-  // Validation du corps de la requête avec le schéma Joi
-  const { error } = registerSchema.validate(req.body, { abortEarly: false });
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: error.details.map((detail) => detail.message) });
-  }
+  // // Validation du corps de la requête avec le schéma Joi
+  // const { error } = registerSchema.validate(req.body, { abortEarly: false });
+  // if (error) {
+  //   return res.status(400).json({ message: error.details.map((detail) => detail.message) });
+  // }
 
   try {
     const {
@@ -34,6 +32,7 @@ const createUser = async (req, res) => {
       secteur,
       cpi,
       termsAccepted,
+      address, // Expecting address object
     } = req.body;
 
     // Vérifier si l'utilisateur existe déjà
@@ -74,6 +73,21 @@ const createUser = async (req, res) => {
       about: "",
     });
 
+    // Vérifier et créer l'adresse si fournie
+    if (address) {
+      const { street, city, region, postalCode, country } = address; // Destructure the address object
+
+      // Create the address
+      await db.Address.create({
+        userId: user.id, // Associating address with the new user
+        street,
+        city,
+        region,
+        postalCode,
+        country,
+      });
+    }
+
     // Créer le lien de vérification d'email
     const verificationUrl = `http://localhost:5173/inscription/${user.id}/verify-email/${emailVerificationToken}`;
     await sendEmail(
@@ -91,6 +105,7 @@ const createUser = async (req, res) => {
     res.status(201).json({
       message:
         "Utilisateur créé avec succès. Un email de vérification a été envoyé.",
+      token, // Optionally return the token
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -107,7 +122,9 @@ const loginUser = async (req, res) => {
   // Validation du corps de la requête avec le schéma Joi
   const { error } = loginSchema.validate(req.body, { abortEarly: false });
   if (error) {
-    return res.status(400).json({ errors: error.details.map((detail) => detail.message) });
+    return res
+      .status(400)
+      .json({ errors: error.details.map((detail) => detail.message) });
   }
 
   const { emailOrCpi, password } = req.body;
@@ -126,21 +143,28 @@ const loginUser = async (req, res) => {
 
     // Assurez-vous que `existingUser` est défini
     if (!existingUser) {
-      return res.status(400).json({ error: "Email/cpi ou mot de passe invalides." });
+      return res
+        .status(400)
+        .json({ error: "Email/cpi ou mot de passe invalides." });
     }
 
     // Vérifier le mot de passe
-    const isPasswordMatch = await bcrypt.compare(password, existingUser.password);
+    const isPasswordMatch = await bcrypt.compare(
+      password,
+      existingUser.password
+    );
     if (!isPasswordMatch) {
-      return res.status(400).json({ error: "Email/cpi ou mot de passe invalides." });
+      return res
+        .status(400)
+        .json({ error: "Email/cpi ou mot de passe invalides." });
     }
 
     // Vérifiez si l'email a été vérifié
-    if (!existingUser.isEmailVerified) {
-      return res.status(400).json({
-        message: "Un email de vérification a été envoyé, veuillez le vérifier.",
-      });
-    }
+    // if (!existingUser.isEmailVerified) {
+    //   return res.status(400).json({
+    //     message: "Un email de vérification a été envoyé, veuillez le vérifier.",
+    //   });
+    // }
 
     // Générer un token JWT
     const token = jwt.sign(
@@ -160,7 +184,6 @@ const loginUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 /**
  * @desc Vérification de l'email de l'utilisateur

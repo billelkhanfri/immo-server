@@ -16,10 +16,13 @@ const getAllUsers = async (req, res) => {
   // }
   try {
     const users = await db.User.findAll({
-      include: { model: db.Profile, as: "Profile" },
       attributes: {
         exclude: ["password"],
       },
+      include: [
+        { model: db.Profile, as: "Profile" },
+        { model: db.Address, as: "address" },
+      ],
     });
 
     res.status(200).json(users);

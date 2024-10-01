@@ -173,6 +173,11 @@ module.exports = (sequelize, DataTypes) => {
       as: "sender",
       onDelete: "CASCADE",
     });
+    User.hasOne(models.Address, { // One-to-one relationship
+      foreignKey: "userId",
+      as: "address",
+      onDelete: "CASCADE",
+    });
   };
 
   return User;

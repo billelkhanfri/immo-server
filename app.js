@@ -70,7 +70,7 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   console.log(
     `Swagger docs available at http://${
-      process.env.HOST || "localhost"
+      process.env.HOST || "localhost" || "http://172.20.10.11"
     }:${PORT}/api-docs`
   );
 });
