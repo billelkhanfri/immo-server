@@ -159,12 +159,12 @@ const loginUser = async (req, res) => {
         .json({ error: "Email/cpi ou mot de passe invalides." });
     }
 
-    // Vérifiez si l'email a été vérifié
-    // if (!existingUser.isEmailVerified) {
-    //   return res.status(400).json({
-    //     message: "Un email de vérification a été envoyé, veuillez le vérifier.",
-    //   });
-    // }
+     //Vérifiez si l'email a été vérifié
+     if (!existingUser.isEmailVerified) {
+       return res.status(400).json({
+        message: "Un email de vérification a été envoyé, veuillez le vérifier.",
+      });
+     }
 
     // Générer un token JWT
     const token = jwt.sign(
